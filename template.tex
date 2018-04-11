@@ -1,0 +1,464 @@
+\documentclass[12pt]{article}
+%\usepackage{times}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{float}
+\usepackage{geometry}
+%this is a comment
+\title{ User Stories and Set-up Assignment: CommunityConnect}
+\author{Kamron Ebrahimi \& Samuel Wilson \& Leif Tsang \\ \& Thomas Korsness  \& Quinton Osborn \\ ebrahimk, wilsosam, tsangl, korsnest, osbornq \\ \scriptsize{Git URL: https://github.com/ebrahimk/CS361-001-W2018/tree/CommunityConnect-Assignment-5/projects/ebrahimk/assignment-5}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+\section{\bf  User Stories Corresponding Tasks}
+  \begin{enumerate}
+    \item \textbf{User views the heat map on the home page.}
+      \begin{itemize}
+        \item The user can see if CommunityConnect is a viable option for them.
+      \end{itemize}
+
+    \item \textbf{User views the “How To Use CommunityConnect” on the home page.}
+      \begin{itemize}
+        \item The user can gain helpful insight into CommunityConnect’s purpose, and the general directions for getting started using the application.
+      \end{itemize}
+
+    \item \textbf{User clicks “Create Profile/Login” from the drop down menu.}
+      \begin{itemize}
+        \item The user is brought an HTML form which prompts the user for input about their location, country of origin, email address, a password, password confirmation and a username.
+      \end{itemize}
+
+    \item \textbf{User wants to find individuals in their area with the same country of origin.}
+      \begin{itemize}
+        \item The user will select the find friends button after logging into his/her page and a list will be returned with matches to the users ethnicity and area that they will be able to connect with.
+      \end{itemize}
+
+    \item \textbf{User Already has an account and wants to view their information}
+      \begin{itemize}
+        \item The user selects the edit/view profile button and is provided with an HTML form. This form holds the previous data and can be edited and saved.
+      \end{itemize}
+
+    \item \textbf{User wants to access people they have already matched with.}
+      \begin{itemize}
+        \item The user selects the matches button and are shown a list of all profiles they have matched with.
+      \end{itemize}
+
+    \item \textbf{User wants to create a group.}
+      \begin{itemize}
+        \item The user creates a group which can contain other users and a separate message board.
+      \end{itemize}
+
+    \item \textbf{User experiences harassment from someone they connected with.}
+      \begin{itemize}
+        \item The user will flag the comment with a tag from a dropdown list for an admin to look at and determine if the account is worth banning or whether the claim was not founded.
+      \end{itemize}
+
+    \item \textbf{User sends an in-app message.}
+      \begin{itemize}
+        \item The user sends a message to another user through a live chat section of the website.
+      \end{itemize}
+
+    \item \textbf{User wants to view the profiles of individuals returned from a search.}
+      \begin{itemize}
+        \item The user clicks on another user’s profile card in the search result web page and is directed to the other user’s profile page.
+      \end{itemize}
+
+    \item \textbf{User wants to edit the information contained in their profile.}
+      \begin{itemize}
+        \item The user selects “Login” from the drop down menu, enters their username and password and is directed to their CommunityConnect profile. Their individual profile contains all of their previously entered information and can be edited manually.
+      \end{itemize}
+
+    \item \textbf{User wants to change the mile radius of searches performed by CommunityConnect.}
+      \begin{itemize}
+        \item The user selects a new mile radius from the search settings.
+      \end{itemize}
+
+    \item  \textbf{User wants to filter search results to only include individuals who share their listed interests.}
+      \begin{itemize}
+        \item The user navigates to the settings menu by accessing the “menu” drop down icon in the top right corner of the home page. The user can then check the box named “filter by interests” to make the search algorithm return profiles based off of the users listed interests.
+      \end{itemize}
+
+    \item  \textbf{User wants to change the age range of individuals CommunityConnect returns after a search.}
+      \begin{itemize}
+        \item The user navigates to the settings menu by accessing the “menu” drop down icon in the top right corner of the home page. The user can then slide the age range button to select an appropriate age range of individuals whom the search algorithm will return.
+      \end{itemize}
+
+  \end{enumerate}
+
+\section{\bf  User Stories and Task Decomposition}
+
+  \begin{enumerate}
+    \item User views the “How To Use CommunityConnect” on the home page.
+      \begin{itemize}
+        \item \textbf{Due:} 2/26/18
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Write a template HTML file for containing the guide text \textbf{-20min}
+              \begin{itemize}
+                \item The completion of this task is independent of the completion of any other task
+              \end{itemize}
+            \item  Write a step by step guide on how to use CommunityConnect \textbf{-20min}
+              \begin{itemize}
+                \item Complete the template HTML file outlined in the first task
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User clicks “Create Profile” from the drop down menu.
+      \begin{itemize}
+        \item \textbf{Due:} 2/28/18
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Write HTML file for profile creation page. \textbf{-20min}
+              \begin{itemize}
+                \item The completion of this task is independent of the completion of any other task
+              \end{itemize}
+            \item Write Javascript for page. \textbf{-2hr}
+              \begin{itemize}
+                \item Complete the HTML file for the page in tasks 1.
+              \end{itemize}
+            \item Write CSS for page. \textbf{-1hr}
+              \begin{itemize}
+                \item Complete the HTML file for the page in tasks 1.
+              \end{itemize}
+            \item Connect page to database. \textbf{-5hr}
+              \begin{itemize}
+                \item Complete all other tasks outlined for this user story.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User views the heat map on the home page.
+      \begin{itemize}
+        \item \textbf{Due:} 3/5/18
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Create HTML for home page. \textbf{-1hr}
+              \begin{itemize}
+                \item The completion of this task is independent of the completion of any other task.
+              \end{itemize}
+            \item Generate JS file to interface with Google maps API. \textbf{-30min}
+              \begin{itemize}
+                \item Complete the HTML file for the page in tasks 1.
+              \end{itemize}
+            \item Have the Google Maps API grab data from the CommunityConnect database. \textbf{-5hr}
+              \begin{itemize}
+                \item Complete all other tasks associated with this user story and create well defined interfaces for the CommunityConnect database so the the Google Maps API can grab said data.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User wants to find individuals in their area with the same country of origin
+      \begin{itemize}
+        \item \textbf{Due:} 3/5/18
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Create a search button on the users home page. \textbf{-20min}
+              \begin{itemize}
+                \item This is dependant on the completion of the users home page.
+              \end{itemize}
+            \item Create a function in javascript to execute matching the users. \textbf{-3hr}
+              \begin{itemize}
+                \item This function is dependant on the completion of the database management. We need to map out how we will store information first.
+              \end{itemize}
+            \item Create an interface for the user to see their results \textbf{-1hr}
+              \begin{itemize}
+                \item When the other 2 tasks are completed, we should be able to finish the interface.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User wants to view the profiles of individuals returned from a search.
+      \begin{itemize}
+        \item \textbf{Due:}  3/5/18
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Write connection to other profiles in Javascript/HTML. \textbf{-1hr}
+              \begin{itemize}
+                \item The completion of this task is contingent on the completion of the backend architecture .
+              \end{itemize}
+            \item Pull the JSON objects containing the profile information from the database and populate the client side page. \textbf{-2hr}
+              \begin{itemize}
+                \item The completion of this task dependant on the completion of the first task within this user story as well as the completion of the HTML/CSS/JS stack for the returned profile webpage on the client side.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User already has an account and wants to view their information
+      \begin{itemize}
+        \item \textbf{Due:} 3/1/18
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Create a view/edit info button. \textbf{-20min}
+              \begin{itemize}
+                \item Dependent on drop down menu being completed.
+              \end{itemize}
+            \item Serve up the HTML form that holds user info. \textbf{-1hr}
+              \begin{itemize}
+                \item Dependent on profile being created and stored in the database correctly.
+              \end{itemize}
+            \item Create save button that updates user info in database. \textbf{-1hr}
+              \begin{itemize}
+                \item Dependent on profile being created and stored. Ability to access the correct info in the database.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User wants to access people they have already matched with.
+      \begin{itemize}
+        \item \textbf{Due:} 3/12/18
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Create HTML for a contacts page. \textbf{-1hr}
+              \begin{itemize}
+                \item Dependent on profiles being completed.
+              \end{itemize}
+            \item Create Javascript for page. \textbf{-1hr}
+              \begin{itemize}
+                \item Dependent on profiles being completed and database being implemented.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User wants to create a group.
+      \begin{itemize}
+        \item \textbf{Due:} If time allows
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item User will join a group that has their own personal page. \textbf{-2hr}
+              \begin{itemize}
+                \item This completion will need to wait until we finish all of the core processes. The website will need to be functioning.
+              \end{itemize}
+            \item The users will be able to post messages on their page along with other things. \textbf{-1hr}
+              \begin{itemize}
+                \item This completion will be implemented in their own personal group page requiring completion of the groups personal page.
+              \end{itemize}
+            \item The user can leave the group via a button on the page. \textbf{-20min}
+              \begin{itemize}
+                \item This button will also be located on the page so it is necessary to have the personal page finished before this is done.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User experiences harassment from someone they connected with.
+      \begin{itemize}
+        \item \textbf{Due:} If time allows
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Create flag button on messages. \textbf{-20min}
+              \begin{itemize}
+                \item Dependent on internal message system being complete.
+              \end{itemize}
+            \item Messages are checked and profile is banned if needed. \textbf{-1hr}
+              \begin{itemize}
+                \item Dependent on message system being complete.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User sends an in-app message.
+      \begin{itemize}
+        \item \textbf{Due:} If time allows
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Create HTML elements. \textbf{-1hr}
+              \begin{itemize}
+                \item Independent from everything.
+              \end{itemize}
+            \item Create Javascript. \textbf{-2hr}
+              \begin{itemize}
+                \item Independent from everything.
+              \end{itemize}
+            \item Create database contact. \textbf{-2hr}
+              \begin{itemize}
+                \item Dependent on database implementation.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User wants to change the mile radius of searches performed by CommunityConnect.
+      \begin{itemize}
+        \item \textbf{Due:} If time allows
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Incorporate the google maps API into our website. \textbf{-2hr 30min}
+              \begin{itemize}
+                \item Once the core of the website is working we can begin working on the google maps API.
+              \end{itemize}
+            \item Utilize this API to calculate distance between users. \textbf{-1hr}
+              \begin{itemize}
+                \item This completion relies on the previous task being completed.
+              \end{itemize}
+            \item Create a function within the search function to match within the mile radius. \textbf{-1hr}
+              \begin{itemize}
+                \item The completion relies on the previous task being completed.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item User wants to filter search results to only include individuals who share their listed interests.
+      \begin{itemize}
+        \item \textbf{Due:} If time allows
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Complete the HTML/CSS stack for the “Settings” webpage. \textbf{-1hr}
+              \begin{itemize}
+                \item The completion of this task is independent of the completion of any other task.
+              \end{itemize}
+            \item Write backend architecture to receive POST requests from the page. \textbf{-1hr 30min}
+              \begin{itemize}
+                \item The completion of this task is dependant on the backend architecture and CommunityConnect database being complete.
+              \end{itemize}
+            \item Parse POST request information and populate JSON object attached to said users profile. \textbf{-1hr 20min}
+              \begin{itemize}
+                \item This task is contingent on the completion of the previous two tasks and the client side page which displays the users match results.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+    \item  User wants to change the age range of individuals CommunityConnect returns after a search.
+      \begin{itemize}
+        \item \textbf{Due:} If time allows
+        \item \textbf{Tasks:}
+          \begin{enumerate}
+            \item Create option to change age range in profile settings. \textbf{-20min}
+              \begin{itemize}
+                \item Dependent on profile settings page being functional, search is functional.
+              \end{itemize}
+            \item Age range is updated on back end. \textbf{-1hr}
+              \begin{itemize}
+                \item Dependent on profile settings page being functional.
+              \end{itemize}
+          \end{enumerate}
+      \end{itemize}
+
+  \end{enumerate}
+
+\newpage
+\section{\bf UML Sequence Diagram/Spike}
+
+        \begin{figure}[H]
+                \includegraphics[width =\linewidth,scale=0.5]{1.eps}
+                \caption{\textbf{User clicks “Create Profile” from the drop down menu.}}
+                \label{fig: Sequence Diagram 1}
+        \end{figure}
+
+      \begin{figure}[H]
+              \includegraphics[width =\linewidth,scale=0.5]{2.eps}
+              \caption{\textbf{User clicks “Create Profile” from the drop down menu.}}
+              \label{fig: Sequence Diagram 2}
+      \end{figure}
+
+    \begin{figure}[H]
+            \includegraphics[width =\linewidth,scale=0.5]{3.eps}
+            \caption{\textbf{User views the heat map on the home page.}}
+            \label{fig: Sequence Diagram 3}
+    \end{figure}
+
+        \begin{figure}[H]
+                \includegraphics[width =\linewidth,scale=0.5]{4.eps}
+                \caption{\textbf{User wants to find individuals in their area with the same country of origin.}}
+                \label{fig: Sequence Diagram 4}
+        \end{figure}
+
+      \begin{figure}[H]
+              \includegraphics[width =\linewidth,scale=0.5]{5.eps}
+              \caption{\textbf{User already has an account and wants to view their information.}}
+              \label{fig: Sequence Diagram 5}
+      \end{figure}
+
+\newpage
+\section{\bf Class Diagram}
+
+\paragraph{\normalfont \indent Due to the fact that implementing the home page only requires fundamental HTML/CSS/JS skills we plan to work on the guide portion of the homepage remotely. To reduce the amount of time individuals spend reverse engineering the work of other, one team member will be assigned to complete each user story. No stringent deadlines are placed on individuals for completing individuals task of user stories. So long as the individual assigned to the user story completes all of the tasks by the deadline the CommunityConnect development team will be satisfied.
+}
+
+  \begin{enumerate}
+
+    \item \textbf{User views the “How To Use CommunityConnect” on the home page.}
+      \begin{itemize}
+        \item \textbf{Owner:} Kamron Ebrahimi
+        \item \textbf{Tasks and Work Distribution:}
+          \begin{enumerate}
+            \item Write a template HTML file for containing the guide text.
+            \item  Write a step by step guide on how to use CommunityConnect .
+          \end{enumerate}
+      \end{itemize}
+
+    \item \textbf{User clicks “Create Profile” from the drop down menu.}
+      \begin{itemize}
+        \item \textbf{Owner:} Sam Wilson
+        \item \textbf{Tasks and Work Distribution:}
+          \begin{enumerate}
+            \item Write HTML file for profile creation page.
+            \item Write HTML file for profile creation page.
+            \item Write CSS for page.
+            \item Connect page to database.
+          \end{enumerate}
+      \end{itemize}
+
+    \item \textbf{User views the heat map on the home page.}
+      \begin{itemize}
+        \item \textbf{Owner:} Leif Tsang
+        \item \textbf{Tasks and Work Distribution:}
+          \begin{enumerate}
+            \item Create HTML for home page. - Completed
+            \item Generate JS file to interface with Google maps API.
+            \item Have the Google Maps API grab data from the CommunityConnect database.
+          \end{enumerate}
+      \end{itemize}
+
+    \item \textbf{User wants to find individuals in their area with the same country of origin.}
+      \begin{itemize}
+        \item \textbf{Owner:} Quinton Osborn
+        \item \textbf{Tasks and Work Distribution:}
+          \begin{enumerate}
+            \item Create a search button on the users home page.
+            \item Create a function in javascript to execute matching the users.
+            \item Create an interface for the user to see their results.
+          \end{enumerate}
+      \end{itemize}
+
+    \item \textbf{User already has an account and wants to view their information.}
+      \begin{itemize}
+        \item \textbf{Owner:}  Thomas Korsness
+        \item \textbf{Tasks and Work Distribution:}
+          \begin{enumerate}
+            \item Create a view/edit info button.
+            \item Serve up the HTML form that holds user info.
+            \item Create save button that updates user info in database.
+          \end{enumerate}
+      \end{itemize}
+
+  \end{enumerate}
+
+\section{\bf Meeting Report}
+
+\paragraph{\normalfont \indent This week the CommunityConnect development team met to discuss some technical challenges we predict to encounter while implementing a rough prototype of the application. Furthermore the team delegated responsibilities and itemized/assigned tasks for each for each spike in the development process.
+}
+\paragraph{\normalfont \indent Next week the team plans to begin writing the client side code (HTML/JavaScript/CSS stack) for the CommunityConnect application. Already some of this code has been completed. This code serves as an solid foundation off which to continue developing CommunityConnect. The next step of the development process will be to complete the back end architecture for the application. The development team has discussed some potential tools of tackling this task and have agreed to utilize Node.js, Express and Handlebars as means of creating a well organized back-end environment.
+}
+\paragraph{\normalfont \indent The customer was able to meet with the development team this week and now the entire
+development has a concrete idea about of how to realize the CommunityConnect application. We have a solid foundation off which to work, an intuitive well prototyped user interface, and well organized documentation to reference (such as use case diagrams and sequence diagrams) to help us along the development process. We expect to see a high-fidelity prototype within the next two weeks.
+}
+\paragraph{\normalfont \indent Kamron has completed the main HTML pages. Next week we will be adding the functionality to these pages through Javascript and database use. All of the tasks will be divided up to each team member by each user case. As each task is completed, team members will mark them as complete on the github readme checklist. Once Monday the 5th comes, we will assess how much work has been accomplished and reassign tasks if uncompleted.
+}
+
+\begin{center}
+\begin{tabular}{ |c|c| }
+ \hline
+ Kamron Ebrahimi & User Stories and Home Page - LaTex \\
+ Quinton Osborn & User Stories \\
+ Leif Tsang & Sequence Diagrams and User Stories \\
+ Thomas Korsness & User Stories and \\
+ Samuel Wilson & User Stories and Meeting Report \\
+ \hline
+\end{tabular}
+\end{center}
+
+\end{document}
