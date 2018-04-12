@@ -1,6 +1,6 @@
 # README
 
-### THIS WILL ONLY RUN ON 0s2.engr.oregonstate.edu
+### THIS WILL ONLY RUN ON os2.engr.oregonstate.edu
 
 
 To setup, run the setup-vm.sh script.
