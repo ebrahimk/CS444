@@ -1,14 +1,16 @@
-\documentclass[10pt,onecolumn,draftclsnofoot]{article} %may need comma after {article}
-\usepackage{serif}
+\documentclass[10pt,onecolumn,draftclsnofoot]{IEEEtran} %may need comma after
+\usepackage{times}
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{float}
 \usepackage{geometry}
 \usepackage{titling}
+\usepackage{longtable,hyperref}
+\newcommand{\longtableendfoot}
 \newgeometry{left=1.905cm, right=1.905cm}
 %this is a comment
 \title{ Project One, CS444, Spring 2018, Homework Group 10}
-\author{Kamron Ebrahimi \& Maximillian Schmidt \& Brendan Byers \\ ebrahimk, schmidtm, byersb }
+\author{Kamron Ebrahimi, Maximillian Schmidt \& Brendan Byers \\ ebrahimk, schmidtm, byersb }
 \date{\today}
 
 \begin{document}
@@ -25,7 +27,7 @@ This report details the process of building the Linux Kernel and running the ker
 \newpage
 \section{\bf  Commands Used}
 
-  \paragraph{\normalfont \indent In order to run the Linux Kernel in a QEMU virtual machine a folder titled "10" was created with the following file path /scratch/spring2018/10. A copy of the linux-yocto repository was then cloned and unzipeed to the group 10 folder using the following commands from the group 10 folder:
+  \paragraph{\normalfont \indent In order to run the Linux Kernel in a QEMU virtual machine a folder titled "10" was created with the following file path /scratch/spring2018/10. A copy of the linux-yocto repository was then cloned and unzipeed to the group 10 folder using the following commands from the group 10 folder.
   }
 
   \begin{itemize}
@@ -74,5 +76,66 @@ This report details the process of building the Linux Kernel and running the ker
 
 \section{\bf  QEMU Command Explanation}
 
+  \begin{itemize}
+    \item \textbf{-gdb tcp::5510}
+    \begin{itemize}
+      \item This will cause QEMU to wait for a connection on a device, which in this case is a tcp port. The connection can also be UDP, pseudo TTY, or standard output. Using standard output allows you to start QEMU from within gdb and establish the connection with a pipe.
+    \end{itemize}
+
+    \item \textbf{-S}
+    \begin{itemize}
+      \item This signals to qemu to not start the CPU at startup.
+    \end{itemize}
+
+    \item \textbf{-nographic}
+    \begin{itemize}
+      \item This will start qemu with graphical output completely disabled. The emulated serial port will usually be redirected to the console.
+    \end{itemize}
+
+    \item \textbf{-kernel bzImage-qemux86.bin}
+    \begin{itemize}
+      \item  Points to the kernel image. This image can either be a standard linux kernel or a kernel in multiboot format.
+    \end{itemize}
+
+    \item \textbf{-drive file=core-image-lsb-sdk-qemux86.ext4,if=virtio -enable-kvm}
+    \begin{itemize}
+      \item The “-drive” defines a new drive, which includes creating the block driver and the guest device. Our drive in this case is “”.  Next, it checks if virtio is enabled and enables the kvm accordingly. Virtio is a virtualization standard that allows the guest to know that is is in a virtual environment.
+    \end{itemize}
+
+    \item \textbf{-net none}
+    \begin{itemize}
+      \item This is used to create an onboard Network Interface Card. In our case we don’t want to create any network interfaces for our kernel. If this option isn’t specified, then a single NIC is created.
+    \end{itemize}
+
+    \item \textbf{-usb}
+    \begin{itemize}
+      \item This flag will enable the usb driver for the guest vm.
+    \end{itemize}
+
+    \item \textbf{-localtime }
+    \begin{itemize}
+      \item This is used to specify that the vm should use local time. This flag has been depreciated as of qemu 2.12.0 and was replaced by the -rtc flag.
+    \end{itemize}
+
+    \item \textbf{--no-reboot}
+    \begin{itemize}
+      \item This will stop qemu from exiting when the guest shuts down. Instead, it will only stop the emulation.
+    \end{itemize}
+
+    \item \textbf{--append "root=/dev/vda rw console=ttyS0 debug"}
+    \begin{itemize}
+      \item This will tell the emulator to use the command line in quotes to be used as the kernel command line. This line here dictates the location of the root directory, what sort of console, and to boot in debug mode.
+    \end{itemize}
+
+  \end{itemize}
+
+\section{\bf Git Log}
+
+  \input{example-output}
+
+  \begin{verbatim}
+  	latex-git-log --width=13 --lang=en > example-output.tex
+  \end{verbatim}
+  
 \restoregeometry
 \end{document}
