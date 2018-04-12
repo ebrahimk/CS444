@@ -1,4 +1,4 @@
-TARGET="insert name of tex file here"
+TARGET=CS444_project1_10
 
 
 default: pdf
