@@ -5,19 +5,23 @@
 \usepackage{float}
 \usepackage{geometry}
 \usepackage{titling}
-\usepackage{longtable,hyperref}
-\newcommand{\longtableendfoot}
+\usepackage{hyperref}
+\usepackage{setspace}
+
 \newgeometry{left=1.905cm, right=1.905cm}
 %this is a comment
 \title{ Project One, CS444, Spring 2018, Homework Group 10}
-\author{Kamron Ebrahimi, Maximillian Schmidt \& Brendan Byers \\ ebrahimk, schmidtm, byersb }
+\author{Kamron Ebrahimi, Maximillian Schmidt \& Brendan Byers \\ ebrahimk, schmidtm, byersbr }
 \date{\today}
 
 \begin{document}
+
 \begin{titlingpage}
 \maketitle
 \begin{abstract}
-This report details the process of building the Linux Kernel and running the kernel on the Oregon State University, operating systems II server. To accomplish this task, the command line based, virtual machine, QEMU, was cloned and configured in order to produce a safe, experimental enviorment in which the Linux Kernel can be modified. This paper will walk the reader through the key components of configuring this enviroment.     %paper abstract here
+\begin{singlespace}
+This report details the process of building the Linux Kernel and running the kernel on the Oregon State University, operating systems II server. To accomplish this task, the command line based, virtual machine, QEMU, was cloned and configured in order to produce a safe, experimental environment in which the Linux Kernel could be modified. This paper will walk the reader through the key components of configuring this environment. The team was able to successfully build the Kernel and boot the Kernel within the QEMU virtual machine.     %paper abstract here
+\end{singlespace}
 \end{abstract}
 \end{titlingpage}
 
@@ -25,55 +29,60 @@ This report details the process of building the Linux Kernel and running the ker
 \tableofcontents
 
 \newpage
+\begin{singlespace}
 \section{\bf  Commands Used}
 
-  \paragraph{\normalfont \indent In order to run the Linux Kernel in a QEMU virtual machine a folder titled "10" was created with the following file path /scratch/spring2018/10. A copy of the linux-yocto repository was then cloned and unzipeed to the group 10 folder using the following commands from the group 10 folder.
-  }
+  \normalfont \indent In order to run the Linux Kernel in a QEMU virtual machine a folder titled "10" was created with the following file path, /scratch/spring2018/10. A copy of the linux-yocto repository was then cloned and unzipped to the group 10 folder using the following commands from within the group 10 folder.
+\hfill\break
 
   \begin{itemize}
     \item \textbf{wget http://git.yoctoproject.org/cgit.cgi/linux-yocto/snapshot/linux-yocto-3.19.2.zip }
     \item \textbf{unzip -q linux-yocto-3.19.2.zip}
   \end{itemize}
+\hfill\break
 
-  \paragraph{\normalfont With the linux-yocto repository successfully cloned the QEMU enviroment needed to be set up and run. Some preliminary measures were required to ensure this was performed properly. First the a script located at the file path /scratch/opt/environment-setup-i586-poky-linux was sourced. All members of group ten operate in the bash shell, thus this script at the aforementioned file path was used. To source this script the following command was executed from the root directory of os2.engr.oregonstate.edu.}
+  \normalfont \indent With the linux-yocto repository successfully cloned the QEMU environment needed to be set up and run. Some preliminary measures were required to ensure this was performed properly. First a script located at the file path /scratch/opt/environment-setup-i586-poky-linux was sourced. All members of group ten operate in the bash shell, thus this script at the aforementioned file path was used. To source this script the following command was executed from the root directory of os2.engr.oregonstate.edu.
 
+\hfill\break
   \begin{itemize}
     \item \textbf{source /scratch/opt/environment-setup-i586-poky-linux}
   \end{itemize}
+\hfill\break
+  \normalfont \indent In order to ensure that the Makefile associated with the Linux Kernel executed properly, the file located at the file path /scratch/files/config-3.19.2-yocto-standard was copied to a newly created folder named ".config" located within the linux-yocto-3.19.2 folder. Additionally the starting Kernel image, bzImage-qemux86.bin and drive file core-image-lsb-sdk-qemux86.ext4 were copied within the linux-yocto-3.19.2 folder. To accomplish this the following commands were executed from within the linux-yocto-3.19.2 folder.
 
-  \paragraph{\normalfont In order to ensure that the Makefile associated with the Linux Kernel executed properly the file located at the file path /scratch/files/config-3.19.2-yocto-standard was copied to a newly created folder named ".config" located within the linux-yocto-3.19.2 folder. Additionally the starting Kernel image, bzImage-qemux86.bin and drive file core-image-lsb-sdk-qemux86.ext4 were copied within the linux-yocto-3.19.2 folder. To accomplish this the following commands were executed from within the linux-yocto-3.19.2 folder.
-  }
-
+\hfill\break
   \begin{itemize}
     \item \textbf{cp /scratch/files/config-3.19.2-yocto-standard ./.config}
     \item \textbf{cp /scratch/files/bzImage-qemux86.bin .}
     \item \textbf{cp /scratch/files/core-image-lsb-sdk-qemux86.ext4 .}
   \end{itemize}
-
-  \paragraph{\normalfont With the aforementioned preliminary configurations complete, the clone of the Linux Kernel could be comiled. The following command allocates four threads to build the Linux Kernel. A limit of the number of threads is used to ensure that no one group consumes to much computational resources on the shared os2.engr.oregonstate.edu server.}
-
+\hfill\break
+  \normalfont \indent With the aforementioned preliminary configurations complete, the clone of the Linux Kernel could be compiled. The following command allocates four threads to build the Linux Kernel. A limit of the number of threads is used to ensure that no one group consumed too many computational resources on the shared os2.engr.oregonstate.edu server.
+\hfill\break
   \begin{itemize}
     \item \textbf{make -j4 all}
   \end{itemize}
-
-  \paragraph{\normalfont With the Kernel built, the last step was to boot the Kernel from within an instance of the QEMU virtual machine. First an instance of QEMU was executed on port 5510 of the os2 server using the following command:}
-
+\hfill\break
+  \normalfont \indent With the Kernel built, the last step was to boot the Kernel from within an instance of the QEMU virtual machine. First an instance of QEMU was executed on port 5510 of the os2 server using the following command:
+\hfill\break
   \begin{itemize}
     \item \textbf{qemu-system-i386 -gdb tcp::5510 -S -nographic -kernel bzImage-qemux86.bin -drive file=core-image-lsb-sdk-qemux86.ext4,if=virtio -enable-kvm -net none -usb -localtime --no-reboot --append "root=/dev/vda rw console=ttyS0 debug"}
   \end{itemize}
+\hfill\break
+  \normalfont \indent Using GDB from another terminal window the Kernel could be executed. To complete this a group member had to connect via port 5510 via GDB to the QEMU virtual machine and execute the "vmlinux" process from within the linux-yocto-3.19.2 folder. The following chain of commands were used while an instance QEMU was running on port 5510, these commands were executed from within the group 10 folder.
 
-  \paragraph{\normalfont Using GDB from another terminal window the Kernel could be executed. To complete this a group member had to connect via port 5510 via GDB to the QEMU virtual machine and execute the "vmlinux" process from within the linux-yocto-3.19.2 folder. The following chain of commands were used while an instance QEMU was running on port 5510, these commands were executed from within the group 10 folder.
-  }
-
+  \hfill\break
   \begin{itemize}
     \item \textbf{\$GDB linux-yocto-3.14/vmlinux}
     \item \textbf{target remote :5510}
     \item \textbf{continue}
   \end{itemize}
+\hfill\break
 
-  \paragraph{\normalfont The above commands create a gdb connection to port 5510 of the os2 server and enters the vmlinux file. The vmlinux executable when run hoists an instance of the Linux Kernel from within the QEMU virtual machine. By running the "continue" command from within the gdb connection, vmlinux is executed which boots the Kernel from within QEMU.
-  }
+  \normalfont \indent The above commands create a gdb connection to port 5510 of the os2 server and enters the vmlinux file. The vmlinux executable when run hoists an instance of the Linux Kernel from within the QEMU virtual machine. By running the "continue" command from within the gdb connection, vmlinux is executed which boots the Kernel from within QEMU.
 
+
+\newpage
 \section{\bf  QEMU Command Explanation}
 
   \begin{itemize}
@@ -129,13 +138,31 @@ This report details the process of building the Linux Kernel and running the ker
 
   \end{itemize}
 
+
 \section{\bf Git Log}
+ 	\begin{center}
+ \begin{tabular}{||c c c||} 
+ \hline
+ Date & Author & Description \\
+ \hline
+ 9/4/2018 & Maximillian Schmidt & Copied yocto VM files \\ 
+ \hline
+ 9/4/2018 & Maximillian Schmidt & Created .config folder and moved config-3.19.2-yocto-standard file into .config \\
+ \hline
+ 10/4/2018 & Maximillian Schmidt & Copied bzImage-qemux86.bin and core-image-lsb-sdk-qemux86.ext4 into yocto environment \\
+ \hline
+\end{tabular}
+	\end{center}
 
-  \input{example-output}
+\newpage
+\section{\bf Work Log}
+\normalfont \indent To track assignment submissions and homework workflow, a git repository was created. All tex and make files are organized within this repository. Below is a detailed repositroy log for project number one. The vast majority of work setting up the yocto-QEMU enviroment was performed at the beginning of week two. After the environment was configured and the Kernel was booted within the QEMU virtual machine each team member was briefed on the configuration process and work on the tex document was started. \hfill\break
 
-  \begin{verbatim}
-  	latex-git-log --width=13 --lang=en > example-output.tex
-  \end{verbatim}
-  
+        \begin{center}
+                \input{changelog.tex}
+        \end{center}
+
+
+\end{singlespace}
 \restoregeometry
 \end{document}
