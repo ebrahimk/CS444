@@ -13,7 +13,7 @@ os.chdir(directory)
 
 mystr = "file"
 
-for x in range(20000):
+for x in range(10000):
 	file_pointer = open(mystr+str(x)+".txt","w+")
 	for y in range(10):
 		newChar = random.choice(string.ascii_lowercase)
@@ -23,7 +23,7 @@ for x in range(20000):
 	file_pointer.close()
 	#reopen the file to verify that the contents were written and a newline character is at the end
 
-for x in range(20000):
+for x in range(10000):
         file_pointer = open(mystr+str(x)+".txt","r")
        	file_pointer.read()  
 	file_pointer.close()
