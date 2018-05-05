@@ -38,8 +38,8 @@ static int look_dispatch(struct request_queue *q, int force)
 		list_del_init(&rq->queuelist);	
 		
 		//perform organizational work of the submission queue in look_add_request() then just add request from that queue in the normal order
-		elv_dispatch_add_tail(q, rq);			
-		//elv_dispatch_sort(q, rq);		
+		//elv_dispatch_add_tail(q, rq);			
+		elv_dispatch_sort(q, rq);		
 
 		return 1;
 	}
@@ -76,14 +76,17 @@ static void look_add_request(struct request_queue *q, struct request *rq)
 		}
 		//if the new request is greater than or equal to the last serviced request we simply add the request so that it will be processed within this run 
 		//of the disk_head before it resets its position at the far terminal
-		if(blk_rq_pos(rq) >= disk_head)
-			if(blk_rq_pos(rq) < blk_rq_pos(current_request))
+		else
+		{
+			if(blk_rq_pos(current_request) < disk_head || blk_rq_pos(rq) < blk_rq_pos(current_request))
 				break;
 		}
 
 	//now current_request is pointing to the value of the node where the new request should be added 		
 	//printk(KERN_DEBUG "LOOK_ADD: %llu\n", blk_rq_pos(rq));
+	}
         list_add_tail(&rq->queuelist, current_position);
+
 }
 
 static struct request *
