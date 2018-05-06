@@ -32,12 +32,12 @@ static int look_dispatch(struct request_queue *q, int force)
 		rq = list_entry(nd->queue.next, struct request, queuelist);
 		
 		//rq is the request which is most recently dispatched, thus the disk head is pointing to this sector after dispatching the request
-		disk_head = blk_rq_pos(rq);
-                printk(KERN_DEBUG "LOOK_DISPATCH: %llu\n", blk_rq_pos(rq));
+                printk(KERN_DEBUG "CLOOK_DISPATCH: %llu\n", blk_rq_pos(rq));
 		
 		list_del_init(&rq->queuelist);	
 		elv_dispatch_add_tail(q, rq);			
-		//elv_dispatch_sort(q, rq);		
+		disk_head = blk_rq_pos(rq);
+	//elv_dispatch_sort(q, rq);		
 
 		return 1;
 	}
@@ -51,9 +51,9 @@ static void look_add_request(struct request_queue *q, struct request *rq)
 	struct list_head* current_position = NULL;
 	struct request* current_request; 
 
-	//printk(KERN_DEBUG "ADDING %llu, last serviced request was at %llu\n", blk_rq_pos(rq), disk_head); 	
+	printk(KERN_DEBUG "ADDING %llu, last serviced request was at %llu\n", blk_rq_pos(rq), disk_head); 	
 	if (list_empty(&nd->queue)) {
-		//printk(KERN_DEBUG "ADD: queue list empty adding item to queue. \n");
+		printk(KERN_DEBUG "ADD: queue list empty adding item to queue. \n");
 		list_add(&rq->queuelist, &nd->queue);
 	}
 	else{
@@ -64,7 +64,7 @@ static void look_add_request(struct request_queue *q, struct request *rq)
 		if(blk_rq_pos(rq) < disk_head)
 		{
 		//less than disk head service on the next run 	
-			 printk(KERN_DEBUG "LOOK_ADD_NEXT_RUN: before disk head with request %llu\n", blk_rq_pos(rq));
+			// printk(KERN_DEBUG "LOOK_ADD_NEXT_RUN: before disk head with request %llu\n", blk_rq_pos(rq));
 			if(blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) ==  blk_rq_pos(current_request)-1){
 				//we have a request in the queue that is adjacent to the new request, merge them
 				printk(KERN_DEBUG "MERGING REQUESTS: %llu with %llu\n",blk_rq_pos(rq), blk_rq_pos(current_request)); 
@@ -74,7 +74,7 @@ static void look_add_request(struct request_queue *q, struct request *rq)
 			if(blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) < blk_rq_pos(current_request))
 			{
 				//break out of loop, current_request retains its value and we can add our request outside of the loop
-				//printk(KERN_DEBUG "LOOK_ADD_IN_NEXT_RUN: before disk head --> servicing %llu\n", blk_rq_pos(rq));
+				printk(KERN_DEBUG "LOOK_ADD: adding request which will be serviced on the next run of the disk head %llu\n", blk_rq_pos(rq));
 				break;
 			}
 		}
@@ -93,7 +93,7 @@ static void look_add_request(struct request_queue *q, struct request *rq)
 			//iterate through the queue until we either find a location that is less than the max request or rq is the new max request 
 			if(blk_rq_pos(current_request) < disk_head || blk_rq_pos(rq) < blk_rq_pos(current_request))
 			{
-				//printk(KERN_DEBUG "LOOK_ADD_IN_GREATER: after disk head --> servicing %llu\n", blk_rq_pos(rq));
+				printk(KERN_DEBUG "LOOK_ADD: adding a request which will be serviced on this run of the disk head %llu\n", blk_rq_pos(rq));
 				break;
 			}
 		}
