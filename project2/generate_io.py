@@ -5,16 +5,15 @@ import random
 import string
 import shutil
 
+starting_dir = os.getcwd()
 directory = "test_dir"
 directory2 ="test_dir1"
-
 mystr = "file"
 
 
 #if we only generate I/O in one directory all of the requests occur in roughly the same sector
 #we thus want to skip around the directory structure
-for z in range(20)
-	
+for z in range(50):	
 	if not os.path.exists(directory):
    		 os.makedirs(directory)
 	os.chdir(directory)
@@ -58,9 +57,9 @@ for z in range(20)
 
 	os.chdir('..') #move to the parent directory 
 	shutil.rmtree(directory) # delete it
-
-	os.chdir('~') #move back to home dir
-        if not os.path.exists(directory):
+	
+	os.chdir(starting_dir) #move back to home dir
+	if not os.path.exists(directory):
                  os.makedirs(directory)
 	os.chdir(directory)
 
