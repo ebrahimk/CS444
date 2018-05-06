@@ -13,12 +13,12 @@ mystr = "file"
 
 #if we only generate I/O in one directory all of the requests occur in roughly the same sector
 #we thus want to skip around the directory structure
-for z in range(200):	
+for z in range(150):	
 	if not os.path.exists(directory):
    		 os.makedirs(directory)
 	os.chdir(directory)
 	
-	for x in range(20):
+	for x in range(100):
 		file_pointer = open(mystr+str(x)+".txt","w+")
 		for y in range(10):
 			newChar = random.choice(string.ascii_lowercase)
@@ -41,7 +41,7 @@ for z in range(200):
                  os.makedirs(directory)
         os.chdir(directory)
 
-        for x in range(20):
+        for x in range(100):
                 file_pointer = open(mystr+str(x)+".txt","w+")
                 for y in range(10):
                         newChar = random.choice(string.ascii_lowercase)
@@ -68,7 +68,7 @@ for z in range(200):
                  os.makedirs(directory2)
         os.chdir(directory2)
 
-        for x in range(20):
+        for x in range(100):
                 file_pointer = open(mystr+str(x)+".txt","w+")
                 for y in range(10):
                         newChar = random.choice(string.ascii_lowercase)
