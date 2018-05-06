@@ -23,7 +23,7 @@
 	language=bash,
 	rulecolor=\color{black},
 	}
-	
+\setlength{\parindent}{1cm}	
 \newgeometry{left=1.905cm, right=1.905cm}
 %this is a comment
 \title{ Project TWO, CS444, Spring 2018, Homework Group 10}
@@ -48,55 +48,56 @@ This report details the process of writing an I/O scheduler module and incorpera
 \begin{singlespace}
 \section{\bf  Design and Implementation}
 
-  \normalfont \indent Prior to designing any solution to this algorithm we first spent several days analyzing the Linux kernel source code. Files of particular interest included the \textbf{block/noop-iosched.c}, \textbf{include/linux/list.h} and \textbf{block/elevator.c}. After studying these files as well as all of the other header files included in the NOOP scheduler, the team had a rough idea of how block drivers functioned. At this point in the design process however the team decided it would be beneficial to experiemnt with \textbf{printk} statements, and try to implement a new I/O scheduler. After some substantial research the team learned that the \textbf{block/Makefile} and \textbf{block/Kconfig.iosched} files had to be edited to include the new scheduler. 
+  \normalfont \indent Prior to designing any solution to this algorithm we first spent several days analyzing the Linux kernel source code. Files of particular interest included the \textit{block/noop-iosched.c}, \textit{include/linux/list.h} and \textit{block/elevator.c}. After studying these files as well as all of the other header files included in the NOOP scheduler, the team had a rough idea of how block drivers functioned. At this point in the design process however the team decided it would be beneficial to experiemnt with \textit{printk} statements, and try to implement a new I/O scheduler. After some substantial research the team learned that the \textit{block/Makefile} and \textit{block/Kconfig.iosched} files had to be edited to include the new scheduler. 
 
-  \normalfont \indent With these files edited to build the new LOOk scheduler into the kernel upon compilation, all that was left to get the new scheduler incorperated into the VM was to change the QEMU invocation command. In order to allow the new scheduler ot be ported into the VM virtio was disabled. The \textbf{-net none} command was also ommitted so files from the git repository could be grabbed with \textbf{wget}. Finally the kernel image \textbf{bzImage-qemux86.bin} was changed to point to \textbf{/arch/x86/boot/bzImage}. This allows the VM to "see" the newly built scheduler. In this fashion we start the VM and switch to the LOOK scheduler using the following commands.
+  \normalfont \indent With these files edited to build the new LOOk scheduler into the kernel upon compilation, all that was left to get the new scheduler incorperated into the VM was to change the QEMU invocation command. In order to allow the new scheduler ot be ported into the VM virtio was disabled. The \textit{-net none} command was also ommitted so files from the git repository could be grabbed with \textit{wget}. Finally the kernel image \textit{bzImage-qemux86.bin} was changed to point to \textit{/arch/x86/boot/bzImage}. This allows the VM to "see" the newly built scheduler. In this fashion we start the VM and switch to the LOOK scheduler using the following commands.
 
   \begin{itemize}
     	\item \textbf{qemu-system-i386 -gdb tcp::5510 -S -nographic -kernel ./arch/x86/boot/bzImage -drive file=core-image-lsb-sdk-qemux86.ext4 -enable-kvm -usb -localtime --no-reboot --append "root=/dev/hda rw console=ttyS0 debug"}
 	\item \textbf{echo look > /sys/block/hda/queue/scheduler}
   \end{itemize}
   
-	\normalfont \indent With the aforementioned edits made the team created the \textit{look-iosched.c} file as a copy of \textit{noop-iosched.c}. Now edits could be made to the new scheduling algorithm, the kernel could be recompiled and the scheduler could be switched to and tested within the VM. 
+	\normalfont \indent With the aforementioned edits made the team created the \textit{look-iosched.c} file as a copy of \textit{noop-iosched.c}. Now edits could be made to the new scheduling algorithm, the kernel could be recompiled and the scheduler could be switched to and tested within the VM. With newly setup testing enviroment, the team researched the finer details of the LOOK algorithm. The LOOK I/O scheduler sorts new requests in a fashion relative to the current position of the read/write disk head. The algorithm needs to service all requests in one direction of the hard drive disk, upon reaching the largest request in the dispatch queue the read write head of the disk returns to the far starting terminal and restarts the process. Keeping this in mind the team knew that the location at which new requests were added needed to be relative to the current location of the read write head. It was decided that a global \textit{sector\_t} variable be maintained which contained the sector value of the last dispatched requests or the physical position of the read write head on the hard drive. Incoming requests could then be sorted in the \textit{look\_add\_request()} function prior to being dispatched. 
+	
+	\normalfont \indent From a high level perpective the implementation of the LOOK algorithm first looks at the sector number of a new request. If the sector value of the new request is greater than the current sector at which the read/write head is located then the new request can be serviced on the current run of the read write head. The request is thus inserted at a location that is less than the value of the read/write head's location or less than the value of some larger request to be serviced on the current run of the read/write head. If on the other hand the incoming request lies at a sector which is less than the sector at which the read/write head is located then new request will have to be serviced on the newxt run of the read/write head. Thus the read/write head would need to service the largest request on its current run, reposition itself back at the start of the disk and perform another run in order to service the new request. Below is the implementation of LOOK used for this assignment, the variable \textit{disk\_head} is at the global scope and is reassigned to the most recently dispatch request's sector\_t value.
 
-	\normalfont \indent With newly setup testing enviroment, the team researched the finer details of the LOOK algorithm. The LOOK I/O scheduler sorts new requests in a fashion relative to the current position of the read/write disk head. The algorithm needs to service all requests in one direction of the hard drive disk, upon reaching the largest request in the dispatch queue the read write head of the disk returns to the far starting terminal and restarts the process. Keeping this in mind the team knew that the location at which new requests were added needed to be relative to the current location of the read write head. It was decided that a global \textit{sector\_t} variable be maintained which contained the sector value of the last dispatched requests or the physical position of the read write head on the hard drive. Incoming requests could then be sorted in the \textit{look\_add\_request()} function prior to being dispatched. 
-	\normalfont \indent From a high level perpective the implementation of the LOOK algorithm first looks at the sector number of a new request. If the sector value of the new request is greater than the current sector at which the read/write head is located then the new request can be serviced on the current run of the read write head. The request is thus inserted at a location that is less than the value of the read/write head's location or less than the value of some larger request to be serviced on the current run of the read/write head. If on the other hand the incoming request lies at a sector which is less than the sector at which the read/write head is located then new request will have to be serviced on the newxt run of the read/write head. Thus the read/write head would need to service the largest request on its current run, reposition itself back at the start of the disk and perform another run in order to service the new request. Below is the implementation of LOOK used for this assignment, the variable \textit{disk\head} is at the global scope and is reassigned to the most recently dispatch request's sector\_t value.
- 
+\newpage 
 \lstinputlisting[language=c]{algorithm.c}
 \begin{center}
 Figure 1.1 CLOOK Algorith Implementation
 \end{center}
 
+\newpage
 \section{\bf Questions}
 	
-	\begin{enumerate}
-	\item \textbf{What do you think the main point of this assignment is?}
-	\normalfont \indent The purpose of this assignment was to gain first hand experience developing within the Linux Kernel. Specifically this assignment was meant to familiarize individuals with some of the avaliable data structures and api's within the kernel as well as how one must go about configuring and building a custom module within the kernel. The assignment also forced us to become more familiar with the QEMU enviroment and invocation commands as well as some underlying principles in writing block device drivers.
+	\textbf{What do you think the main point of this assignment is?}\\
+		
+		\normalfont \indent The purpose of this assignment was to gain first hand experience developing within the Linux Kernel. Specifically this assignment was meant to familiarize individuals with some of the avaliable data structures and api's within the kernel as well as how one must go about configuring and building a custom module within the kernel. The assignment also forced us to become more familiar with the QEMU enviroment and invocation commands as well as some underlying principles in writing block device drivers.\\
 	
-	\item \textbf{How did you personally approach the problem?}
-	\normalfont \indent This being the teams first up close encounter with kernel source code we were all initially overwhelmed by the density of the source code and seemgly endless references to functions and macros in other header files. To exacerbate the situation the team quickly found out how poorly documented the Linux source code really was. Without extensive documentation the first step was to trace through the source code and get a rough idea of how all of the small components worked together. This was suprisingly difficult and time consuming and each tema member encountered multiple lines of code with syntax they had never before encountered. 
-	\normalfont \indent The team recognized that the logical place to start was the NOOP scheduler. The most difficult part of this program to grasp was the multiqueued architecture of the program. We knew that the NOOP scheduler performed no sorting and simply maintained a FIFO queue, thus it was initially very confusing trying to understand the flow of requests between \textit{noop\_add\_request()} and \textit{noop\_dispatch()}. We eventually determined through the use of \textit{printk()} statements that requests could be sorted in either of these functions and that requests are initially added to the dispatch queue via \textit{noop\_add\_request()}. With this determined we figured the most efficient way to implementeing the algorithm was to perform the insertion sort within this funciton and maintain the order as requests were placed in the dispatch queue. To track the disk heads position a global variable was used which was reassigned after every execution of \textit{noop\_dispatch()} to equal the sector\_t value of the most recently dispatch request. With this global variable incoming requests could be placed within the request queue relative to the disk heads position.
+	\textbf{How did you personally approach the problem?}\\
+	
+		\normalfont \indent This being the teams first up close encounter with kernel source code we were all initially overwhelmed by the density of the source code and seemgly endless references to functions and macros in other header files. To exacerbate the situation the team quickly found out how poorly documented the Linux source code really was. Without extensive documentation the first step was to trace through the source code and get a rough idea of how all of the small components worked together. This was suprisingly difficult and time consuming and each tema member encountered multiple lines of code with syntax they had never before encountered. 
+	
+		\normalfont \indent The team recognized that the logical place to start was the NOOP scheduler. The most difficult part of this program to grasp was the multiqueued architecture of the program. We knew that the NOOP scheduler performed no sorting and simply maintained a FIFO queue, thus it was initially very confusing trying to understand the flow of requests between \textit{noop\_add\_request()} and \textit{noop\_dispatch()}. We eventually determined through the use of \textit{printk()} statements that requests could be sorted in either of these functions and that requests are initially added to the dispatch queue via \textit{noop\_add\_request()}. With this determined we figured the most efficient way to implementeing the algorithm was to perform the insertion sort within this funciton and maintain the order as requests were placed in the dispatch queue. To track the disk heads position a global variable was used which was reassigned after every execution of \textit{noop\_dispatch()} to equal the sector\_t value of the most recently dispatch request. With this global variable incoming requests could be placed within the request queue relative to the disk heads position.\\
 
 
 	%discuss testing and python scripts used to grab and parse data 
-	\item \textbf{How did you ensure your solution was correct?}
-	\normalfont \indent The team ran into several roadblocks when trying to test the solution. This was primarily caused by the nature of incoming requests. 
+	\textbf{How did you ensure your solution was correct?}\\
+	
+		\normalfont \indent The team ran into several roadblocks when trying to test the solution. This was primarily caused by the nature of incoming requests. \\
 
-	\item \textbf{What did you learn?}
+	\textbf{What did you learn?}\\
 	\normalfont \indent
 
-	\item \textbf{How should the TA evaluate your work?}
+	\textbf{How should the TA evaluate your work?}\\
 	\normalfont \indent	
 
-	\end{enumerate}
 
 
 \newpage
 \section{\bf Work Log}
 
-        \begin{center}
                 \input{changelog.tex}
-        \end{center}
 
 \newpage
 
