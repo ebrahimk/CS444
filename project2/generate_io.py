@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/cbin/env python
 
 import os
 import random
@@ -13,7 +13,7 @@ mystr = "file"
 
 #if we only generate I/O in one directory all of the requests occur in roughly the same sector
 #we thus want to skip around the directory structure
-for z in range(150):	
+for z in range(10):	
 	if not os.path.exists(directory):
    		 os.makedirs(directory)
 	os.chdir(directory)
@@ -33,6 +33,7 @@ for z in range(150):
 		file_pointer.close()	
 
 	os.chdir('..') #move to folder in which script exists 
+	shutil.rmtree(directory)
 	os.chdir('..')	#move one folder above that
 
         if not os.path.exists(directory):
@@ -54,7 +55,8 @@ for z in range(150):
                 file_pointer.close()	
 
 	os.chdir('..') #move to the parent directory 
-	
+	shutil.rmtree(directory)
+
 	os.chdir(starting_dir) #move back to home dir
 	if not os.path.exists(directory):
                  os.makedirs(directory)
@@ -80,7 +82,9 @@ for z in range(150):
                 file_pointer.close()
 
 	os.chdir('..') 
+	shutil.rmtree(directory2)
 	os.chdir('..') #move to the parent directory 
+	shutil.rmtree(directory)
 	#back in the home directory
 
 
