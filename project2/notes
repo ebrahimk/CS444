@@ -1,6 +1,6 @@
-To change I/O schedulers you need to go "cat /sys/block/hdc/queue/scheduler". To display all of the available schedulers. The shceduler currently in use will be displayed within brackets.
-To change to a different scheduler "echo SCHEDULER_NAME > /sys/block/hdc/queue/scheduler".
-
+To change I/O schedulers you need to go "cat /sys/block/hda/queue/scheduler". To display all of the available schedulers. The shceduler currently in use will be displayed within brackets.
+To change to a different scheduler "echo look > /sys/block/hda/queue/scheduler".
+echo cfq > /sys/block/hda/queue/scheduler
 
 1.) Write LOOK module
 2.) place in directory

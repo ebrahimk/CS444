@@ -6,8 +6,8 @@ import string
 import shutil
 
 starting_dir = os.getcwd()
-directory = "test_dir"
-directory2 ="test_dir1"
+directory = "test_dir_second"
+directory2 ="test_dir_second1"
 mystr = "file"
 
 
