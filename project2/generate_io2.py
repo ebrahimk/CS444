@@ -13,7 +13,7 @@ mystr = "file"
 
 #if we only generate I/O in one directory all of the requests occur in roughly the same sector
 #we thus want to skip around the directory structure
-for z in range(200):	
+for z in range(50):	
 	if not os.path.exists(directory):
    		 os.makedirs(directory)
 	os.chdir(directory)
