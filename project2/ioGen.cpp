@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 const unsigned long long size=1024ULL*1024ULL;
 unsigned long long a[size];
 
