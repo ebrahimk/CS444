@@ -17,8 +17,9 @@ static void look_add_request(struct request_queue *q, struct request *rq)
 			current_request = list_entry(current_position, struct request, queuelist);
 			if(blk_rq_pos(rq) < disk_head)
 			{
-				if((blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) ==  blk_rq_pos(current_request)-1)
-				|| (blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) ==  blk_rq_pos(current_request))){
+				if( (blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) == blk_rq_pos(current_request)-1) || 
+				    (blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) ==  blk_rq_pos(current_request))) {
+
 					elv_merge_requests(q,rq,current_request);
 					return;
 				}
@@ -31,9 +32,10 @@ static void look_add_request(struct request_queue *q, struct request *rq)
 				}
 			}
 			else{
-				if((blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) ==  blk_rq_pos(current_request)-1)
-				||(blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) &&
-				blk_rq_pos(rq) ==  blk_rq_pos(current_request))){
+				if( (blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) ==  blk_rq_pos(current_request)-1) ||
+				    (blk_rq_pos(current_request) < disk_head && blk_rq_pos(rq) && 
+				     blk_rq_pos(rq) ==  blk_rq_pos(current_request))) {
+
 					elv_merge_requests(q,rq,current_request);
 					return;
 				}

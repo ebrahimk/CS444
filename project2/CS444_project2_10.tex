@@ -59,7 +59,7 @@ This report details the process of writing an I/O scheduler module and incorpera
 
         \normalfont \indent With the aforementioned edits made the team created the \textit{look-iosched.c} file as a copy of \textit{noop-iosched.c}. Now edits could be made to the new scheduling algorithm, the kernel could be recompiled and the scheduler could be switched to and tested within the VM. With newly setup testing environment, the team researched the finer details of the LOOK algorithm. The LOOK I/O scheduler sorts new requests in a fashion relative to the current position of the read/write disk head. The algorithm needs to service all requests in one direction of the hard drive disk, upon reaching the largest request in the dispatch queue the read write head of the disk returns to the far starting terminal and restarts the process. Keeping this in mind the team knew that the location at which new requests were added needed to be relative to the current location of the read write head. It was decided that a global \textit{sector\_t} variable be maintained which contained the sector value of the last dispatched requests or the physical position of the read write head on the hard drive. Incoming requests could then be sorted in the \textit{look\_add\_request()} function prior to being dispatched.
 
-        \normalfont \indent From a high level perspective the implementation of the LOOK algorithm first looks at the sector number of a new request. If the sector value of the new request is greater than the current sector at which the read/write head is located then the new request can be serviced on the current run of the read write head. The request is thus inserted at a location that is less than the value of the read/write head's location or less than the value of some larger request to be serviced on the current run of the read/write head. If on the other hand the incoming request lies at a sector which is less than the sector at which the read/write head is located then new request will have to be serviced on the next run of the read/write head. Thus the read/write head would need to service the largest request on its current run, reposition itself back at the start of the disk and perform another run in order to service the new request. Below is the implementation of LOOK used for this assignment, the variable \textit{disk\_head} is at the global scope and is reassigned to the most recently dispatch request's sector\_t value.
+        \normalfont \indent From a high level perspective the implementation of the LOOK algorithm first looks at the sector number of a new request. If the sector value of the new request is greater than the current sector at which the read/write head is located then the new request can be serviced on the current run of the read write head. The request is thus inserted at a location that is less than the value of the read/write head's location or less than the value of some larger request to be serviced on the current run of the read/write head. If on the other hand the incoming request lies at a sector which is less than the sector at which the read/write head is located then new request will have to be serviced on the next run of the read/write head. Thus the read/write head would need to service the largest request on its current run, reposition itself back at the start of the disk and perform another run in order to service the new request. Below is the implementation of CLOOK used for this assignment, the variable \textit{disk\_head} is at the global scope and is reassigned to the most recently dispatch request's sector\_t value.
 
 \newpage
 \lstinputlisting[language=c]{algorithm.c}
@@ -99,12 +99,23 @@ Figure 1.1 CLOOK Algorithm Implementation
         \normalfont \indent This assignment threw the entire team into deep waters with no paddle. No team meber had looked much into the Linux source code, let alone ever written a block device driver. To complete this assignment a great deal of overhead research was done. The team learned how to edit the Kconfig files located throughout the kernel as well as how to use the various data structures and API's provided by the Kernel developers. Lastly and most importantly the team grew comfortable in different debugging methods for Kernel programming. The \textit{printk()} function was extremely helpful in learning how some poorly documented, confusing functions worked.\\
 
         \textbf{How should the TA evaluate your work?}\\
-        \normalfont \indent To evaluate the algorithm follow the below steps
-        \begin{enumerate}
-                \item First apply the patch file 
-                \item
-                \item
+        
+	\normalfont \indent The below steps if followed correctly will get you into a running instance of VM, download a test script and a C++ file which will produce fast I/O. The test script will change the in use scheduler, compile the C++ file and execute the file. The LOOK scheduler implemented in our patch file uses \textit{printk()} statements which print "LOOK\_DISPATCH" then the sector of the request dispatched. These statements can be accessed using \textit{dmesg}. We pipe this into grep and look for the "LOOK\_DIPATCH" string and grab those values. The values are written to a file and the contents are printed to the console. Scroll through the results which show the order of requests being dispatched. You will see that requests are sorted in a wave like pattern as the head of the read/write disk services requests from small to large then immediatley jumps back to a small request as specified in the CLOOK algorithm.\\
+
+
+	\begin{enumerate}
+                \item Apply the patch file for the CLOOK algorithm implementation, this includes an updated \textit{Block/Makefile}, \textit{Block/Kconfig.iosched} and \textit{Block/look-iosched.c} files. 
+                \item With the files incorperated into the kernel run \textbf{qemu-system-i386 -gdb tcp::5510 -S -nographic -kernel ./arch/x86/boot/bzImage -drive file=core-image-lsb-sdk-qemux86.ext4 -enable-kvm -usb -localtime --no-reboot --append "root=/dev/hda rw console=ttyS0 debug"}.
+                \item In a seperate terminal within the \textit{linux-yocto-3.19.2} on the os2 server run \textbf{\$GDB vmlinux}.
+		\item In the same terminal with GDB running enter \textbf{target remote: 5510} then \textbf{continue}.
+		\item The VM should start up, when prompted for login credentials enter \textbf{root}.
+		\item At the command line of the VM enter \textbf{wget https://raw.githubusercontent.com/ebrahimk/CS444/master/project2/gen\_IO.cpp}.
+		\item At the command line again, run \textbf{wget https://raw.githubusercontent.com/ebrahimk/CS444/master/project2/test.sh}.
+		\item Run \textbf{chmod +x test.sh}.
+		\item Finally run \textbf{./test.sh}. Please note that this generates a ton of I/O so it will take a little while. 
+		\item Run \textbf{cat test/data\_results}
         \end{enumerate}
+	
 
 \newpage
 \section{\bf Work Log}
