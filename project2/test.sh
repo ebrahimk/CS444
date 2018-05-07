@@ -5,7 +5,6 @@ cat /sys/block/hda/queue/scheduler
 
 #change scheduler
 echo look > /sys/block/hda/queue/scheduler
-#echo cfq > /sys/block/hda/queue/scheduler
 
 #verify scheduler change
 cat /sys/block/hda/queue/scheduler
@@ -28,5 +27,6 @@ echo cfq > /sys/block/hda/queue/scheduler
 #use the grep command to isolate request that were queued up
 dmesg | grep LOOK_DISPATCH > data_results
 
-#cat the results out 
+#cat the results out
+echo --------RESULTS--------- 
 cat data_results
