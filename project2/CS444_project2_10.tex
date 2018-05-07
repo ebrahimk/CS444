@@ -105,13 +105,13 @@ Figure 1.1 CLOOK Algorithm Implementation
 
 	\begin{enumerate}
                 \item Apply the patch file for the CLOOK algorithm implementation, this includes an updated \textit{Block/Makefile}, \textit{Block/Kconfig.iosched} and \textit{Block/look-iosched.c} files. 
-                \item With the files incorperated into the kernel run \textbf{qemu-system-i386 -gdb tcp::5510 -S -nographic -kernel ./arch/x86/boot/bzImage -drive file=core-image-lsb-sdk-qemux86.ext4 -enable-kvm -usb -localtime --no-reboot --append "root=/dev/hda rw console=ttyS0 debug"}.
+                \item With the files incorperated into the kernel run: qemu-system-i386 -gdb tcp::5510 -S -nographic -kernel ./arch/x86/boot/bzImage -drive file=core-image-lsb-sdk-qemux86.ext4 -enable-kvm -usb -localtime --no-reboot --append "root=/dev/hda rw console=ttyS0 debug"
                 \item In a seperate terminal within the \textit{linux-yocto-3.19.2} on the os2 server run \textbf{\$GDB vmlinux}.
 		\item In the same terminal with GDB running enter \textbf{target remote: 5510} then \textbf{continue}.
 		\item The VM should start up, when prompted for login credentials enter \textbf{root}.
-		\item At the command line of the VM enter \textbf{wget https://raw.githubusercontent.com/ebrahimk/CS444/master/project2/gen\_IO.cpp}.
-		\item At the command line again, run \textbf{wget https://raw.githubusercontent.com/ebrahimk/CS444/master/project2/test.sh}.
-		\item Run \textbf{chmod +x test.sh}.
+		\item At the command line of the VM enter \textbf{wget https://raw.githubusercontent.com/ebrahimk/CS444/master/project2/gen\_IO.cpp}
+		\item At the command line again, run \textbf{wget https://raw.githubusercontent.com/ebrahimk/CS444/master/project2/test.sh}
+		\item Run \textbf{chmod +x test.sh}
 		\item Finally run \textbf{./test.sh}. Please note that this generates a ton of I/O so it will take a little while. 
 		\item Run \textbf{cat test/data\_results}
         \end{enumerate}

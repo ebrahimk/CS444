@@ -14,7 +14,7 @@ cat /sys/block/hda/queue/scheduler
 #compile the I/O generate function 
 g++ gen_IO.cpp 
  
-#make a new test dir and move to it
+#make a new test dir and move to it for easy clean up 
 mkdir test 
 mv a.out test 
 cd ./test
