@@ -5,15 +5,22 @@ cat /sys/block/hda/queue/scheduler
 
 #change scheduler
 echo look > /sys/block/hda/queue/scheduler
+#echo cfq > /sys/block/hda/queue/scheduler
 
 #verify scheduler change
 cat /sys/block/hda/queue/scheduler
 
+
 #compile the I/O generate function 
-c++ gen_IO.cpp -o gen_io
+g++ gen_IO.cpp 
+ 
+#make a new test dir and move to it
+mkdir test 
+mv a.out test 
+cd ./test
 
 #call the executable
-./gen_io 
+./a.out
 
 #turn look off so printk statements quit popping up 
 echo cfq > /sys/block/hda/queue/scheduler

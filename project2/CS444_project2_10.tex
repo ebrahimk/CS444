@@ -26,7 +26,7 @@
 \setlength{\parindent}{1cm}
 \newgeometry{left=1.905cm, right=1.905cm}
 %this is a comment
-\title{ Project TWO, CS444, Spring 2018, Homework Group 10}
+\title{ Project Two, CS444, Spring 2018, Homework Group 10}
 \author{Kamron Ebrahimi, Maximillian Schmidt \& Brendan Byers \\ ebrahimk, schmidtm, byersbr }
 \date{\today}
 
@@ -50,7 +50,7 @@ This report details the process of writing an I/O scheduler module and incorpera
 
   \normalfont \indent Prior to designing any solution to this algorithm we first spent several days analyzing the Linux kernel source code. Files of particular interest included the \textit{block/noop-iosched.c}, \textit{include/linux/list.h} and \textit{block/elevator.c}. After studying these files as well as all of the other header files included in the NOOP scheduler, the team had a rough idea of how block drivers functioned. At this point in the design process however the team decided it would be beneficial to experiment with \textit{printk} statements, and try to implement a new I/O scheduler. After some substantial research the team learned that the \textit{block/Makefile} and \textit{block/Kconfig.iosched} files had to be edited to include the new scheduler.
 
-  \normalfont \indent With these files edited to build the new LOOk scheduler into the kernel upon compilation, all that was left to get the new scheduler incorporated into the VM was to change the QEMU invocation command. In order to allow the new scheduler ot be ported into the VM virtio was disabled. The \textit{-net none} command was also omitted so files from the git repository could be grabbed with \textit{wget}. Finally the kernel image \textit{bzImage-qemux86.bin} was changed to point to \textit{/arch/x86/boot/bzImage}. This allows the VM to "see" the newly built scheduler. In this fashion we start the VM and switch to the LOOK scheduler using the following commands.
+  \normalfont \indent With these files edited to build the new LOOk scheduler into the kernel upon compilation, all that was left to get the new scheduler incorporated into the VM was to change the QEMU invocation command. In order to port the new scheduler into the VM, virtio was disabled. The \textit{-net none} command was also omitted so files from the git repository could be grabbed with \textit{wget}. Finally the kernel image \textit{bzImage-qemux86.bin} was changed to point to \textit{/arch/x86/boot/bzImage}. This allows the VM to "see" the newly built scheduler. In this fashion we start the VM and switch to the LOOK scheduler using the following commands.
 
   \begin{itemize}
         \item \textbf{qemu-system-i386 -gdb tcp::5510 -S -nographic -kernel ./arch/x86/boot/bzImage -drive file=core-image-lsb-sdk-qemux86.ext4 -enable-kvm -usb -localtime --no-reboot --append "root=/dev/hda rw console=ttyS0 debug"}
@@ -86,13 +86,22 @@ Figure 1.1 CLOOK Algorithm Implementation
 
                 \normalfont \indent The team ran into several roadblocks when trying to test the solution. This was primarily caused by the nature of incoming requests. Initially a python script was written to generate I/O in one folder. However the requests made by the scheduler when executing this script were all in the same location and in ascending order, thus the sorting functionality of the algorithm was not tested. The script was edited to create multiple different folders and perform read write operation on files within those folders. This method also was ineffective. Python produced I/O requests at a rate slower than shedulers ability to process them. Thus a request queue was never able to form and requests were processed as soon as they arrived. The solution the team arrived at was to write a c++ file to produce I/O. C++ executes much faster than Python and as a result of this method request arrived at an extremely fast rate throttling the scheduling algorithm and causing the requests to queue up. Once a queue started to form it became easy to see how the algorithm sorted incoming requests. Additionally, in order to avoid the issue of reporting requests that were serviced upon arrival, the algorithm makes use of a global variable \textit{queue\_exists}. If \textit{look\_add\_request()} is called and the queue is empty this variable is set to false, thus causing a \textit{printk()} statement within \textit{look\_dispatch()} to not trigger. In this fashion only requests thats are sorted by the LOOK algorithm are displayed allowing the team to verify that the algorithm works properly. The team used \textit{printk} statements extensively in their implementation to provide status reports on the inner workings of the algorithm and wrote a test script for the TA's which changes the scheduler, executes the C++ code, then grabs all of the relevant kernel statements which detail the order of the dispatch queue and prints the statements to the console. Below is a graph of data collected when using our algorithm showing the sector of the request serviced versus the time at which the request was serviced. A sharp sawtooth pattern can be seen, an expected pattern for the CLOOK algorithm.\\
 
+	\begin{center}	
+        \begin{figure}[H]
+                \includegraphics[width =\linewidth,scale=0.5]{data_plot.eps}
+                \caption{Sectors of Dispatched Requests VS Time}
+                \label{fig: Class Diagram 1}
+        \end{figure}
+	\end{center}
+
+\newpage
         \textbf{What did you learn?}\\
         \normalfont \indent This assignment threw the entire team into deep waters with no paddle. No team meber had looked much into the Linux source code, let alone ever written a block device driver. To complete this assignment a great deal of overhead research was done. The team learned how to edit the Kconfig files located throughout the kernel as well as how to use the various data structures and API's provided by the Kernel developers. Lastly and most importantly the team grew comfortable in different debugging methods for Kernel programming. The \textit{printk()} function was extremely helpful in learning how some poorly documented, confusing functions worked.\\
 
         \textbf{How should the TA evaluate your work?}\\
         \normalfont \indent To evaluate the algorithm follow the below steps
         \begin{enumerate}
-                \item
+                \item First apply the patch file 
                 \item
                 \item
         \end{enumerate}
@@ -103,13 +112,6 @@ Figure 1.1 CLOOK Algorithm Implementation
                 \input{changelog.tex}
 
 \newpage
-
-%include Block/Makefile and Kconfig.iosched 
-
-\section{\bf Scripts}
-\normalfont \indent Below was the python script used to generate I/O. This script was imported to a VM using \textbf{wget} command and executed.
-
-\lstinputlisting[language=python]{generate_io.py}
 
 
 \end{singlespace}

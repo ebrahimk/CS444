@@ -111,6 +111,10 @@ static void look_add_request(struct request_queue *q, struct request *rq)
 				printk(KERN_DEBUG "LOOK_ADD: adding a request which will be serviced on this run of the disk head %llu\n", blk_rq_pos(rq));
 				break;
 			}
+			//Triggered if the next run queue has not been built up and the incoming request is the largest request in the queue
+			else{
+			        printk(KERN_DEBUG "LOOK_ADD: adding a request which will be serviced on this run of the disk head %llu\n", blk_rq_pos(rq));
+			}
 		}
 
 	//now current_request is pointing to the value of the node where the new request should be added 		
