@@ -1,0 +1,101 @@
+\documentclass[10pt,onecolumn,draftclsnofoot]{IEEEtran} %may need comma after
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{
+        basicstyle=\footnotesize,
+        commentstyle=\color{mygreen},
+        frame=single,
+        keywordstyle=\color{blue},
+        numberstyle=\tiny\color{mygray},
+        numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+        numbersep=5pt,
+        language=bash,
+        rulecolor=\color{black},
+        }
+\setlength{\parindent}{1cm}
+\newgeometry{left=1.905cm, right=1.905cm}
+%this is a comment
+\title{ Project Three, CS444, Spring 2018, Homework Group 10}
+\author{Kamron Ebrahimi, Maximillian Schmidt \& Brendan Byers \\ ebrahimk, schmidtm, byersbr }
+\date{\today}
+
+\begin{document}
+
+\begin{titlingpage}
+\maketitle
+\begin{abstract}
+\begin{singlespace}
+This report details the process of setting up and configuring a Linux block device module and the specific aspect of the Linux kernel \textit{crypto} api. In this project the team produced block device driver which behaved like a RAM  disk. The disk would encrypt written data upon successful writes and would decrypt said data successful reads. All encryption and decryption was performed using the Linux Kernel \textit{crypto} api, in particular the kernel \textit{AES} cryptography algorithm. In addition to producing this block driver the team also learned how to import and configure Kernel modules a critical concept for Linux Kernel tuning. 
+\end{singlespace}
+\end{abstract}
+\end{titlingpage}
+
+
+\tableofcontents
+
+\newpage
+\begin{singlespace}
+\section{\bf  Design and Implementation}
+
+  \normalfont \indent The team started this assignment by first researching Linux Kernel modules and finding examples of simple block device drivers. After settling on the \textit{sbd} template the team began researching how each function within the \textit{sbd} implementation worked. It was determined that the \textit{sbd\_init()} registered the block driver with the kernel by providing a \textit{major num} to the driver. This function also allocated the proper amount of space for the block driver. The team determined that this function would also need to contain all initialization of structures used to implement the cryptographic requirements for this assignment.
+
+  \normalfont \indent The \textit{sbd\_request} simply managed the servicing of incoming requests to the driver. From within this function is a call to \textit{sbd\_tranfer} which data describing the incoming request is actually transferred to the output queue for servicing. In the case of this assignment the team determined that the encryption of all data contained within an incoming request was to be encrypted before being dispatched and serviced, i.e. physically written to the RAM disk. 
+
+
+   \normalfont \indent With a rough idea of how the algorithm would be implemented in mind the team set about understanding the Kernel \textit{crypto} api. The \textit{crypto} api suffers from remarkably poor, sparse documentation. From class lectures the team knew that utilizing the \textit{AES} encryption algorithm would be the most straightforward approach to completing the assignment. Thus instead of trying to dig through pages of poor \textit{crypto} documentation, the team tried to find reference examples in which the \textit{AES} algorithm is used. This produced fruitful results and after some exhaustive testing the team was able to figure out how to implement the \textit{AES} algorithm.  
+
+   \normalfont \indent The final step to completing the algorithm was to tie all of the ends together and figure out how to actually import the module and mount the ext2 file system. This was accomplished with a variety of commands such as \textit{mkfs.ext2}, \textit{mount}, and \textit{insmod}. With these commands the kernel module's \textit{.ko} object could be transferred within a running instance of the virtual machine via \textit{scp} and inserted into the kernel. The file system could then be produced and mounted within the VM and reading and writing to the file system could ensue. 
+
+\section{\bf Questions}
+
+        \textbf{What do you think the main point of this assignment is?}\\
+
+                \normalfont \indent The purpose of this assignment was to familiarize the team with writing and configuring kernel block device modules. In particular this project offered insight into some of the memory management submodules within the Linux Kernel. The assignment also allowed the team to gain some first hand experience using poorly document apis. A great deal of kernel source code is poorly documented and this project strengthened the teams ability to utilize outside resources. 
+        
+	%discuss testing and python scripts used to grab and parse data 
+        \textbf{How did you ensure your solution was correct?}\\
+
+                \normalfont \indent After completing the kernel module, the team compiled the module and spun a running instance of the VM. From within the VM the \textit{scp} command was used to transfer the \textit{.ko} file into the VM. Using \textit{insmod} the module was imported into the kernel. Then using \textit{mkfs.ext2} and \textit{mount} the \textit{ext2} file system was created and mounted so we could test our module. We could then simply write a string of text to file system. If correct the text string should be the same string that was written when read. Additionally by calling \textit{cat } on the contents of the device we could see the encrypted version of our text string. To stream line this entire process a demo script was produced which can automate the setup of the enviroment, demo the module by writing "hello world" to the mounted file system, then \textit{cat} the contents of the device and the contents of the mounted file system. The former produces encrypted nonsense and the latter produces the "hello world" text string. 
+
+
+        \textbf{What did you learn?}\\
+        \normalfont \indent This assignment was a perfect introduction to writing modules in the Linux Kernel. The project perfectly illustrated how Linux goes about providing a clean and easy interface for importing customized modules. Additionally this assignment showed the team just how poorly documented some aspects of Linux Kernel are and drove home the point that often information is not just readily available and pre packaged for consumption but must be extrapolated from a variety of resources. The team really had to dig through examples and test a lot of iterations in order to get the \textit{crypto} algorithm working properly.
+
+        \textbf{How should the TA evaluate your work?}\\
+
+	\begin{enumerate}
+                \item  
+                \item 
+                \item 
+		\item
+		\item
+		\item
+		\item
+		\item
+		\item
+		\item
+        \end{enumerate}
+
+\newpage
+\section{\bf Work Log}
+
+                \input{changelog.tex}
+
+\newpage
+
+
+\end{singlespace}
+\restoregeometry
+\end{document}
+

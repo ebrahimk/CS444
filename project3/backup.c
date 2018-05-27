@@ -9,6 +9,7 @@
 #include <linux/genhd.h>
 #include <blkdev.h>
 #include <linux/hdreg.h>
+#include <linux/crypto.h>
 
 static int major_num = 0;
 module_param(major_num, int, 0);
@@ -19,13 +20,18 @@ module_param(nsectors, int, 0);
 
 #define KERNEL_SECTOR_SIZE 512
 
+#define KEY_LEN 32	//AES key size can be 128, 192, or 256 BITS.
+
 static struct request_queue *Queue;
 
 static struct sbd_device {
-	unsigned li=ong size;
+	unsigned long size;
 	spinlock_t lock;
 	u8 *data;
 	struct gendisk *gd;
+
+	struct crypto_cipher *cipher_handle;
+	u8 key[KEY_LEN];
 } Device;
 
 static void sbd_transfer(struct sbd_device *dev, sector_t sector,
@@ -33,16 +39,21 @@ static void sbd_transfer(struct sbd_device *dev, sector_t sector,
 {
 	unsigned long offset = sector * logical_block_size;
 	unsigned long nbytes = nsect * logical_block_size;
+	
 	if ((offset + nbytes) > dev->size) {
 		printk (KERN_NOTICE "sbd: Beyond-end write (%ld %ld)\n", offset, nbytes);
 		return;
 	}
 	if (write)
 		//encrypt
-		memcpy(dev->data + offset, buffer, nbytes);
+		//TODO: we need to loop here, because aes encrypts in blocks.  if the buffer is larger than a block,
+		//we use another.  The AES blocksize is 512 BITS
+		crypto_cipher_encrypt_one(Device->cipher_handle, dev->data+offset, buffer);
+		//memcpy(dev->data + offset, buffer, nbytes);
 	else
 		//decrypt
-		memcpy(buffer, dev->data + offset, nbytes);
+		crypto_cipher_decrypt_one(Device->cipher_handle, dev->data+offset, buffer);
+		//memcpy(buffer, dev->data + offset, nbytes);
 }
 
 static void sbd_request(struct request_queue *q) {
@@ -92,18 +103,31 @@ static int __init sbd_init(void){
 	Device.gd = alloc_disk(16);
 	if(!Device.gd)
 		goto out_unregister;
-	//Go through and set gendisk values
+	//Go through and set gendisk values.  these are used when we add the disk.
 	Device.gd->major = major_num;
 	Device.gd->first_minor = 0;
 	Device.gd->fops = &sbd_ops;
 	Device.gd->private_data = &Device;
-	strcpy(Device.gd->dick_name, "sbd0");
+	//Setup cipher
+	//Allocate the cipher
+	Device.cipher_handle = crypto_alloc_cipher("aes", 0, CRYPTO_ALG_ASYNC);
+	//Generate and set the key
+	//TODO: currently incorrect.  Needs to be able to be set from outside the module
+	const u8 key[KEY_LEN]=get_random_bytes(&key, sizeof(u8)*KEY_LEN);
+	memcpy(Device.key,key,KEY_LEN);		
+	int result = crypto_cipher_setkey(Device.cipher_handle, key, KEY_LEN);
+	if(result != 0){
+		//error out
+	}
+
+
+	strcpy(Device.gd->disk_name, "sbd0");
 	set_capacity(Device.gd, nsectors);
 	Device.gd->queue = Queue;
 	add_disk(Device.gd);
 
 	return 0;
-
+	//this is the error area.  If we encounter an error in the function, GOTO here and free memory.
 	out_unregister:
 		unregister_blkdev(major_num, "sbd");
 	out:
