@@ -211,6 +211,64 @@ static void slob_free_pages(void *b, int order)
 	free_pages((unsigned long)b, order);
 }
 
+
+asmlinkage long sys_get_slob_amt_claimed(int size){
+	long page_nums=0;
+	struct list_head *sloblist;
+	struct page *sp;
+	unsigned long flags;
+	spin_lock_irqsave(&slob_lock, flags);
+	if(size==1){ //small
+		slob_list=*free_slob_small;
+		list_for_each_entry(sp,slob_list,list){
+			num_pages++;
+		}
+	}
+	else if(size==2){
+		slob_list=*free+slob_medium;
+		list_for_each_entry(sp,slob_list,lsist){
+			num_pages++;
+		}
+	}
+	else if(size==4){
+		slob_list=*free+slob_medium;
+		list_for_each_entry(sp,slob_list,lsist){
+			num_pages++;
+		}
+	}
+	spin_lock_irqrestore(&slob_lock,flags);
+	return num_pages;
+}
+
+asmlinkage long sys_get_slob_amt_free(int size){
+	long free_space=0;
+	struct list_head *sloblist;
+	struct page *sp;
+	unsigned long flags;
+	spin_lock_irqsave(&slob_lock, flags);
+	if(size==1){ //small
+		slob_list=*free_slob_small;
+		list_for_each_entry(sp,slob_list,list){
+			free_space+=sp->units;
+		}
+
+	}
+	else if(size==2){
+		slob_list=*free+slob_medium;
+		list_for_each_entry(sp,slob_list,lsist){
+			free_space+=sp->units;
+		}
+	}
+	else if(size==4){
+		slob_list=*free+slob_medium;
+		list_for_each_entry(sp,slob_list,lsist){
+			free_space+=sp->units;
+		}
+	}
+	spin_lock_irqrestore(&slob_lock,flags);
+	return free_space;
+}
+
 /*
  * Allocate a slob block within a given slob_page sp.
  */
@@ -228,11 +286,11 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 	slob_t *best_fit = NULL;	
 	slob_t* next_best_fit;
 	slob_t* prev_best_fit = NULL;
-	//slob_t* best_fit_aligned = NULL; 	
-	//int best_fit_delta = 0; 
+	slob_t* best_fit_aligned = NULL; 	
+	int best_fit_delta = 0; 
 	slobidx_t avail;
 
-//printk("In slob_page_alloc\n");
+	//printk("In slob_page_alloc\n");
 
 	//FIND THE BEST FIT BLOCK 
 	//By scanning through the linked list we want to find the best fit block via comparisons to "best_fit_size"
@@ -259,10 +317,10 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 			prev_best_fit = prev;
 			best_fit = cur; 
 			best_fit_size = avail - (units + delta);
-			
+
 			//save the delta value for the best fit block			
-			//!!best_fit_delta = delta; 
-			//!!best_fit_aligned = aligned; 
+			best_fit_delta = delta; 
+			best_fit_aligned = aligned; 
 
 			//check for perfect match for faster servicing
 			if(best_fit_size == 0)
@@ -283,39 +341,23 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 	//slob first fit allocation method with our saved parameters without having to dig too deep into the internal workings of the code.
 	if(best_fit != NULL){
 
-		
+
 		best_fit_avail = slob_units(best_fit); 
-		
-		
-		avail = slob_units(best_fit);
-		aligned  =(slob_t *)ALIGN((unsigned long)best_fit, align);
-		delta = aligned - best_fit; 
-		
-	
-		
-		if (delta) {
+
+
+		if (best_fit_delta) {
 			next_best_fit = slob_next(best_fit);
-			set_slob(aligned, avail - delta, next_best_fit);
-			set_slob(best_fit, delta, aligned);
+			set_slob(best_fit_aligned, best_fit_avail - best_fit_delta, next_best_fit);
+			set_slob(best_fit, best_fit_delta, best_fit_aligned);
 			prev_best_fit = best_fit;
-			best_fit = aligned;
-			avail = slob_units(best_fit);
+			best_fit   = best_fit_aligned;
+			best_fit_avail = slob_units(best_fit);
 		}
 
-			/*
-		   if (best_fit_delta) {
-		   next_best_fit = slob_next(best_fit);
-		   set_slob(best_fit_aligned, best_fit_avail - best_fit_delta, next_best_fit);
-		   set_slob(best_fit, best_fit_delta, best_fit_aligned);
-		   prev_best_fit = best_fit;
-		   best_fit   = best_fit_aligned;
-		   best_fit_avail = slob_units(best_fit);
-		   }*/
-		
 
 		next_best_fit = slob_next(best_fit);
 
-		if (avail == units) { /* exact fit? unlink. */
+		if (best_fit_avail == units) { /* exact fit? unlink. */
 			if (prev_best_fit)
 				set_slob(prev_best_fit, slob_units(prev_best_fit), next_best_fit);
 			else
@@ -325,7 +367,7 @@ static void *slob_page_alloc(struct page *sp, size_t size, int align)
 				set_slob(prev_best_fit, slob_units(prev_best_fit), best_fit + units);
 			else
 				sp->freelist = best_fit + units;
-			set_slob(best_fit + units, avail - units, next_best_fit);
+			set_slob(best_fit + units, best_fit_avail - units, next_best_fit);
 		}
 
 		sp->units -= units;
@@ -349,7 +391,6 @@ static int find_best_page(struct page *sp, size_t size, int align)
 	slob_t *best_fit = NULL;
 	slobidx_t best_fit_size = -1;
 
-	printk("Seraching for page with best fit\n");
 	for (prev = NULL, cur = sp->freelist; ; prev = cur, cur = slob_next(cur)) {
 
 		slobidx_t avail = slob_units(cur);

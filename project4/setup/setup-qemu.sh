@@ -9,6 +9,8 @@ PROJECT_DIR="/scratch/spring2018/$GROUP_NUM"
 
 cd $PROJECT_DIR
 
+mkdir ./
+
 echo "Unzipping yocto vanilla image"
 unzip -q linux-yocto-3.19.2.zip
 
@@ -16,7 +18,7 @@ cd ./linux-yocto-3.19.2
 
 echo "Copying source config files..."
 cp /scratch/files/config-3.19.2-yocto-standard ./.config
-cp /scratch/files/bzImages-qemux86.bin .
+cp /scratch/files/bzImage-qemux86.bin .
 cp /scratch/files/core-image-lsb-sdk-qemux86.ext4 .
 cp $PROJECT_DIR/CS444/project3/includes/spin-vm.sh .
 
@@ -30,16 +32,7 @@ make -j4 all
 echo ""
 echo ""
 echo "   DONE"
-sleep 5
-
-# Move to the directory containing the source code for the new module
-cd $PROJECT_DIR/CS444/project4/module
-
-# Compile the kernel module
-make
-
-echo "   DONE"
-sleep 5
+sleep 3
 
 echo "The script will continue on after the VM is started"
 echo "Please start the VM in another terminal and log in with username: root"
@@ -52,11 +45,14 @@ read -p "Press enter to continue when ready..."
 
 echo "scp'ing files to the VM... "
 echo 
-scp -P 5510 sbd.ko root@localhost:~
-echo
-scp -P 5510 ../includes/demo-script.sh root@localhost:~
 
-echo "Module and demo script copied to the VM's /home/root/"
+cd $PROJECT_DIR/CS444/project4/test
+scp -P 5510 ./Makefile root@localhost:~/
+echo
+scp -P 5510 ./s-call.c root@localhost:~/
+echo
+scp -p 5510 ./test.sh root@localhost:~/
+echo "Tests copied to the VM's /home/root/"
 
 cd $PROJECT_DIR/CS444/project3/
 

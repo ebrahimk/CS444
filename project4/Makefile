@@ -1,4 +1,4 @@
-TARGET=CS444_project3_10
+TARGET=CS444_project4_10
 
 
 default: pdf
