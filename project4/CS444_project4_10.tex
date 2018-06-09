@@ -45,8 +45,8 @@ The report focuses on the creation of a best-fit allocation algorithm and how ef
 \tableofcontents
 
 \newpage
-o\begin{singlespace}
-\section{\bf  Design and Implementation}
+\begin{singlespace}
+\section{\bf  Design and Implementation Prior To Execution}
 
   \normalfont \indent The team started this assignment by first researching the allocation algorithms present in the Linux Kernel. To handle memory allocations that are smaller than a page, one of three allocation algorithms are used: SLAB, SLUB, and SLOB.  SLAB and SLUB are more complex allocation algorithms that are often much more effecient than SLOB.  SLAB allocation works be pre-allocating memory in caches so that when a request to allocate memory is recieved, it can immediatly fill that request.  Unlike SLOB, SLAB eliminates fragmentation due to it allocating an entire "slab" at once.  SLUB was created as a response to the SLAB allocator, which requires a lot of overhead to operate.  SLUB creates a \textit{slab} similar to the SLAB algorithm, but it will manipulate these slabs as needed, such as modifying queue sizes, merging slabs, and partial slabs.  Also, instead of storing metadata about the slab at the beginning of the block, SLUB keeps the metadata in a page struct, meaning that the data stored in the slab will be aligned to the block and fit within a 4k block without needing extra space. 
   \normalfont \indent For this assignment we will be comparing our best-fit allocation scheme to a SLOB implementation.  SLOB is a first-fit algorithm, meaning that when served with a request it will reference a list of free blocks, allocating to the first one that is large enough for the request.  This can result in a large amount of fragmentation because the first block that fits may not be the optimal block. The best fit algorithm that we will be creating will try and place blocks in the best spot, so there is less fragmentation.
@@ -57,11 +57,13 @@ o\begin{singlespace}
         \textbf{What do you think the main point of this assignment is?}\\
                 \normalfont \indent The purpose of this assignment was to learn about how memory is allocated at the kernel level. Usually programs use virtual memory provided by the kernel to allocate objects and store information.  With this assignment we looked at the different types of algorithms, and their various shortfalls.  The SLOB allocator that we were comparing against was pretty simple to grasp, making it easier grasp how memory allocation and management work. Additionally, we had to understand and write algorithms that would result in fitting requests into the optimal memory location. \\\\
        \textbf{How did you personally aproach the problem? Design decisions, algorithm, etc.}\\
-	  		\normalfont \indent 
-	  \textbf{How did you ensure your solution was correct?}\\
+	  		\normalfont \indent Our approach to completing this assignment was to first do research. The team had to get up to speed on Linux SLAB allocators and their theory of operation. Once the team had a good conceptual understanding of how the slob allocator was configured and a rough idea of the programs structure the team analyzed the first fit method. This was the most time consuming part of the assignment as the team had to trace through many lines of kernel code to figure out how the program worked. Understanding the first fit algorithm laid the foundation for successfully writing the best fit algorithm. After a rough prototype for the best fit algorithm was completed the team tested the algorithm only on the current page. This took some debugging. This kernel assignment required substantially more lines of code than the previous assignments and thus there huge room for small mistakes. It took the team some time to get the VM booted and runnning properly and with the best fit algorithm operating properly over a single page the team tweaked the \textit{slob\_alloc()} function to perform best fit over every allocated page. With this complete the team set about configuring system calls and writing testing scripts for the grading TA's.
+ 
+	\textbf{How did you ensure your solution was correct?}\\
                 \normalfont \indent   
-               \textbf{What did you learn?}\\
-        		\normalfont \indent
+        \textbf{What did you learn?}\\
+        		\normalfont \indent The team learned a substantial amount about the inner working of the Linux memory management systems. We learned why SLAB allocators improve performance, and some fundamental concepts regarding data fragmentation (both external and internal) and how fragmentation can be avoided. Additionally the team learned how to configure system calls. In conclusion this assignment offerend a huge amount of learning oppurtunities and was both challenging and fun. 
+
         \textbf{How should the TA evaluate your work?}\\
 	\section{\bf Work Log}
 
