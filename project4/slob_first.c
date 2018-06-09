@@ -211,6 +211,84 @@ static void slob_free_pages(void *b, int order)
 	free_pages((unsigned long)b, order);
 }
 
+asmlinkage long sys_get_slob_amt_claimed(int size){
+	long page_nums=0;
+	struct list_head *sloblist;
+	struct page *sp;
+	unsigned long flags;
+	spin_lock_irqsave(&slob_lock, flags);
+	if(size==1){ //small
+		slob_list=*free_slob_small;
+		list_for_each_entry(sp,slob_list,list){
+			num_pages++;
+		}
+	}
+	else if(size==2){
+		slob_list=*free+slob_medium;
+		list_for_each_entry(sp,slob_list,lsist){
+			num_pages++;
+		}
+	}
+	else if(size==4){
+		slob_list=*free+slob_medium;
+		list_for_each_entry(sp,slob_list,lsist){
+			num_pages++;
+		}
+	}
+	spin_lock_irqrestore(&slob_lock,flags);
+	if(size==1){
+		printk("small space pages:\t %ld",num_pages);
+	}
+	selse if(size==2){
+		printk("Med. space pages:\t %ld",num_pages);
+	}
+	else if(size==3){
+		printk("Large space pages:\t %ld",num_pages);
+	}
+	return num_pages;
+}
+
+asmlinkage long sys_get_slob_amt_free(int size){
+	long free_space=0;
+	struct list_head *sloblist;
+	struct page *sp;
+	unsigned long flags;
+	
+	spin_lock_irqsave(&slob_lock, flags);
+	if(size==1){ //small
+		slob_list=*free_slob_small;
+		list_for_each_entry(sp,slob_list,list){
+			free_space+=sp->units;
+			
+		}
+	}
+	else if(size==2){
+		slob_list=*free+slob_medium;
+		list_for_each_entry(sp,slob_list,lsist){
+			free_space+=sp->units;
+		}
+	}
+	else if(size==4){
+		slob_list=*free+slob_medium;
+		list_for_each_entry(sp,slob_list,lsist){
+			free_space+=sp->units;
+		}
+	}
+	spin_lock_irqrestore(&slob_lock,flags);
+	if(size==1){
+		printk("small space free:\t %ld",free_space);
+
+	}
+	selse if(size==2){
+		printk("Med. space free:\t %ld",free_space);
+	}
+	else if(size==3){
+		printk("Large space free:\t %ld",free_space);
+	}
+	return free_space;
+}
+
+
 /*
  * Allocate a slob block within a given slob_page sp.
  */

@@ -237,6 +237,7 @@ asmlinkage long sys_get_slob_amt_claimed(int size){
 		}
 	}
 	spin_lock_irqrestore(&slob_lock,flags);
+	printk("Total free_Space: %d",free_space);
 	return num_pages;
 }
 
@@ -245,13 +246,14 @@ asmlinkage long sys_get_slob_amt_free(int size){
 	struct list_head *sloblist;
 	struct page *sp;
 	unsigned long flags;
+	
 	spin_lock_irqsave(&slob_lock, flags);
 	if(size==1){ //small
 		slob_list=*free_slob_small;
 		list_for_each_entry(sp,slob_list,list){
 			free_space+=sp->units;
+			
 		}
-
 	}
 	else if(size==2){
 		slob_list=*free+slob_medium;
@@ -266,6 +268,7 @@ asmlinkage long sys_get_slob_amt_free(int size){
 		}
 	}
 	spin_lock_irqrestore(&slob_lock,flags);
+	printk("Total free_Space: %d",free_space);
 	return free_space;
 }
 
