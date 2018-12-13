@@ -6,19 +6,13 @@
 #include "mt19937ar.h"
 #include <assert.h>
 
-<<<<<<< HEAD
 //Define Item structure, this represents one item within the buffer 
-=======
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 typedef struct{
 	int value;
 	int time;
 }Item;
 
-<<<<<<< HEAD
 //Define synchronization structure
-=======
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 typedef struct{
 	Item container[32];
 	int length;
@@ -29,21 +23,12 @@ typedef struct{
 	sem_t spaces;
 }Queue;	
 
-<<<<<<< HEAD
-=======
-
-unsigned int getRand();
-
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 //Functions to run as threads
 void *produce(void *);
 void *consume(void *);
 
 //List management
-<<<<<<< HEAD
 unsigned int getRand();
-=======
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 void push(Item item);
 Item pop();
 void initQueue();
@@ -53,10 +38,6 @@ void systemType();
 int SYSTEMTYPE;
 Queue buffer; 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 int main(){
 	//Seed the random number generator
 	init_genrand(0);
@@ -67,17 +48,10 @@ int main(){
 	//initialize the Queue
 	initQueue();
 
-<<<<<<< HEAD
 	//Initialize two pthread_t structures 
 	pthread_t producer;
 	pthread_t consumer;
 
-=======
-	pthread_t producer;
-	pthread_t consumer;
-
-
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 	//Start our two threads
 	int threadResult;
 	threadResult = pthread_create(&producer,NULL,produce,NULL); 
@@ -85,21 +59,12 @@ int main(){
 	threadResult = pthread_create(&consumer,NULL,consume,NULL);
 	assert(threadResult == 0);
 
-<<<<<<< HEAD
 	//Join the two threads, this will cause the thread executing our main function, the parent thread to block until
 	//the producer and consumer threads complete.  However both the producer and consumer threads are locked in infinitle loops.
 	pthread_join(producer,NULL);
 	pthread_join(consumer,NULL);
 	
 	//Destroy our semaphores. In theory this code will never be executed. 
-=======
-
-	//Join our two threads.  This should not really happen because
-	//each of our threads is an infinite loop.
-	pthread_join(producer,NULL);
-	pthread_join(consumer,NULL);
-	//Destroy our semaphores
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 	sem_destroy(&buffer.spaces);
 	sem_destroy(&buffer.mutex);
 	sem_destroy(&buffer.items);
@@ -107,7 +72,6 @@ int main(){
 	return 0;
 }
 
-<<<<<<< HEAD
 /***********************************
  * Name:		initQueue() 
  * Preconditions:	Process is executed.
@@ -116,8 +80,6 @@ int main(){
  * 			as well as initialize the length of the structure and the Item array.
  * Return:		N/A 
  * *********************************/
-=======
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 void initQueue(){
 	if(     sem_init(&buffer.spaces,0,32)==-1 ||
 			sem_init(&buffer.mutex,0,1)==-1 ||
@@ -132,7 +94,6 @@ void initQueue(){
 	buffer.next_out = 0;
 }
 
-<<<<<<< HEAD
 /***********************************
  * Name:		systemType()
  * Preconditions:	Process is executed.
@@ -143,8 +104,6 @@ void initQueue(){
  * 			Otherwise the Mersenne Twister is used. 
  * Return:		Sets the SYSTEMTYPE global variable. 
  * *********************************/
-=======
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 void systemType(){
 	//Setup our registers 
 	unsigned int eax,ebx,ecx,edx;
@@ -163,7 +122,6 @@ void systemType(){
 	}
 }
 
-<<<<<<< HEAD
 /***********************************
  * Name:		getRand() 
  * Preconditions:	The produced thread is executig the produce routine.
@@ -175,8 +133,6 @@ void systemType(){
  * 			ceiling and floor value. 
  * Return:
  * *********************************/
-=======
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 unsigned int getRand(int min, int max){
 	int num;
 	//Generate the number
@@ -190,7 +146,6 @@ unsigned int getRand(int min, int max){
 	else{   //Using mt19937
 		num = genrand_int31(); //defined in mtwist.c
 	}
-<<<<<<< HEAD
 	
 	num = abs(num%(max-min)+1);
 	return num; 
@@ -213,13 +168,6 @@ unsigned int getRand(int min, int max){
  * 			changes the mutex semaphore to 1, indicating that the mutex is unlocked. 
  * Return:		N/A
  * *********************************/
-=======
-
-	num = abs(num%(max-min));
-	return num; 
-}
-
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 void push(Item item) {
 	sem_wait(&buffer.spaces);
 	sem_wait(&buffer.mutex);
@@ -231,7 +179,6 @@ void push(Item item) {
 	sem_post(&buffer.items);
 }
 
-<<<<<<< HEAD
 /***********************************
  * Name:		pop()
  * Preconditions:	The consumer thread is executing the consume routine. 
@@ -244,8 +191,6 @@ void push(Item item) {
  * 			buffer and that the mutex is unlocked. 
  * Return:		N/A
  * *********************************/
-=======
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 Item pop() {
 	sem_wait(&buffer.items);
 	sem_wait(&buffer.mutex);
@@ -259,7 +204,6 @@ Item pop() {
 	return item;
 }
 
-<<<<<<< HEAD
 /***********************************
  * Name:		produce()
  * Preconditions:	The producer thread is created.
@@ -268,9 +212,6 @@ Item pop() {
  * 			fills the value and consumption time of the Item structure and calls push() to place the item in the buffer. 
  * Return:		N/A
  * *********************************/
-=======
-
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 void* produce(void *v){
 	Item newItem;
 	int wait;
@@ -284,7 +225,6 @@ void* produce(void *v){
 	}	
 }
 
-<<<<<<< HEAD
 /***********************************		
  * Name:		consume()
  * Preconditions:	The consumer thread was successfully created. 	
@@ -293,17 +233,11 @@ void* produce(void *v){
  * 			then prints the value of the item which was just consumed.  
  * Return:		N/A
  * *********************************/
-=======
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 void* consume(void *v){
 	Item consumedItem;
 	while(1){
 		consumedItem = pop();
 		sleep(consumedItem.time);
-<<<<<<< HEAD
 		printf("Consumed Item with value and this is the time to consume: %d\n", consumedItem.value);
-=======
-		printf("Consumed Item with value: %d\n", consumedItem.value);
->>>>>>> b6b9eb246d8520fe1435c3c33019cc1dbc70b537
 	}
 }

@@ -1,0 +1,59 @@
+\section{\bf Linux}
+  \subsection{\bf Processes and Threads}
+    \normalfont \indent The memory management implementation in Linux is highly modelled off legacy architectures and the physical memory hardware of the system. Small embedded, low end Linux systems often lack unique memory management unit and share one contiguous memory space. This architecture poses several immediate problems for larger scale more complicated applications, such as rouge programs stomping on other processes or infringing on illegal address space real estate. These problems are solved by the addition of a unique memory management unit within the Linux operating system as well as the use of a virtual memory abstraction. 
+	
+	\normalfont \indent Virtual memory is a virtual mapping of virtual addresses to real physical addresses via a piece of hardware named the memory management unit. The mapping lookup table is coined the \textit{translational lookaside buffer (TLB)} This abstraction provides a critical layer of indirection which myriad of benefits, kernel and user memory can be easily isolated from one another, memory can be moved, memory can also be swapped out to the disk, memory can be mapped and made accessible to multiple processes at once, and specific memory regions can be configured with particular access permissions.\cite{}
+	
+	\normalfont \indent The virtual memory mapping is partitioned into Kernel mappings and user space mappings. The top half of the mapping table soley maps kernel level processes and are coined kernel logical addresses, the separation in virtual memory between user virtual addresses and kernel virtual addresses is tracked by the \textit{PAGE_OFFSET} macro. These are the memory addresses which are allocated via \textit{kmalloc()} calls as seen in figure 1. 
+	
+\lstinputlisting[language=c]{example.c}
+\begin{center}
+Figure 1 Using Kmalloc  
+\end{center}
+
+      \normalfont \indent The memory management unit performs work on a granularity coined a \textit{page}. A page is simply the smallest addressable unit of virtual memory and is a generally 4K bytes on most 32-bit x86 machines and 8kK on 64-bit machines\cite{}. A \textit{page’s} physical counterpart is called a \textit{page frame}. The TLB allows multiple processes to access physically non-contiguous pages frames in physical memory. Additionally multiple processes in virtual memory comprised of a contiguous block of frames, can access the same data by simple establishing pointers to the same page frame in physical memory. Below is the data structure definition of a \textit{page} struct within the Linux Kernel.
+	 
+\lstinputlisting[language=c]{example2.c}
+\begin{center}
+Figure 2 The Definition of the Page struct in the Linux Source Code
+\end{center}
+	
+	  \normalfont \indent Linux partitions clusters of page structures into four different \textit{Zones}. These zones allow the operating system to cluster pages based off similar traits. Zoning is a critical addition to Linux memory management as it allows the operating system to service multiple diffrent types and configurations of hardware and architectures. For example some architectures do not support direct memory access (DMA), thus a one of the page zones maintained by the kernel is the \textit{ZONE_DMA}. Pages stored in this page cluster can, as the name implies, undergoe direct memory access. The other zones managed by the Linux Kernel are as follow: 
+	  
+	\begin{itemize}
+		\item ZONE\_DMA
+			\begin{itemize}
+				\item Direct memory access pages.
+			\end{itemize}
+		\item ZONE\_DMA32 
+			\begin{itemize}
+				\item Direct memory accessible pages for 32 bit architectures.
+			\end{itemize}
+		\item ZONE\_NORMAL
+			\begin{itemize}
+				\item Regularly mapped pages
+			\end{itemize}
+		\item ZONE\_HIGHMEM
+			\begin{itemize}
+				\item Coined “high memory”, pages within the ZONE\_HIGHMEM are not permanently mapped within the Kernels memory. 
+			\end{itemize}
+	\end{itemize} 
+
+	\normalfont \indent A critical layer of the Linux memory management system is the  \textit{SLAB Layer}. Memory allocators are responsible for allocating memory in such a manner as to reduce fragmentation and improve overall system performance. The default allocator implemented by the Linux kernel for large systems is the \textit{slab allocator}. The kernel is responsible for the instantiation and manipulation of a myriad data structures, some of which are used on an incredibly frequent basis, to streamline the creation of these structures the slab allocator caches data commonly used data structures. The slab layer is is a tree like data structure, at the roots of the tree are cache objects, \textit{kmem_cache}. A cache exists for each object type used in the Kernel, these caches point to \textit{slab} structures which in turn reference a number of arbitrary objects. Below is the Linux implementation of a \textit{slab} data structure, the “s_mem” member of the structures points to the first object in the slab, this object is the actual structure which is being cached by the slab layer. 
+	
+	\lstinputlisting[language=c]{example3.c} 
+\begin{center}
+Figure 3 Definition of the \textit{slab} structure in the Linux source code. 
+\end{center}
+
+\section{\bf Windows}
+	\normalfont \indent Like Linux Windows implements a virtual memory abstraction and addresses virtual memory at the granularity of a page. The most starek difference between the Windows implementation of memory management and the Linux implementation is Windows use of memory pools. On system initialization Windows dynamically creates to memory pools, \textit{paged pools} and \nonpaged pools}. Nonpaged pools are a ranges of virtual address with a direct, guaranteed physically address mapping, thus these addresses can be accessed at any time and are guaranteed not to generate a page fault. Kernel objects which are stored in nonpaged pools include structures representing threads, semaphores, processes and interrupt request packets. Paged pools on the other hand are a region of system memory which can be paged in and out of the system \cite{}.
+
+	\normalfont \indent Windows employs a similar mechanism to Linux’s \textit{SLAB allocator}, coined \textit{look-aside-lists}. Memory allocations within the above menmtioned pools occur on a dynamic basis, thus allocations of any size can occur. Look-aside-lists provide fixed block memory allocation for frequently used objects by the Windows kernel, almost identical to the slab allocator.
+	  
+\section{\bf FreeBSD}
+	\normalfont \indent The freeBSD memory management system has a had a long history of developmental setbacks. The original virtual memory implementation was designed when memory was incredibly expensive. Thus the design was sparing in resource consumption. Further attempts to update the original virtual memory designed were met with failure and the system was finally completely rebuilt from the ground up for FreeBSD 4.4. Under the new virtual memory scheme processes can map files anywhere in their address space and share parts of their address space by through shared mappings of identical files.
+	
+	\normalfont \indent During a system call in FreeBSD4.4 memory from the process address space is entirely copied over to a buffer residing in the Kernel. This information transfer can be a time consuming process and is a significant drawback of the FreeBSD memory management system. This design choice is primarily made out of necessity as user data is not page aligned and is not a multiple of the page frame \cite{}. 
+	
+

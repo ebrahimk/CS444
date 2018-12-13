@@ -1,0 +1,83 @@
+
+\section{ \bf Processes and Threads Across Linux, Windows, and FreeBSD}
+\subsection{\bf Linux}
+  \subsubsection{\bf Processes and Threads}
+    \normalfont \indent While both the Windows family of operating systems and FreeBSD are full-fledge operating systems, Linux is a kernel and provides the core functionality of an operating system. The specific Linux distribution provide all of the peripheral features common in standard operating systems. The most fundamental unit of execution in the Linux Kernel is a process. A process is a running instance of a program. Processes consist of occupied user space memory which contain the program used to produce the process and the corresponding variables manipulated within the process. Additionally a process contains a variety of Kernel data structures which track and monitor the status of the given process represented by the \textit{task\_struct}. These \textit{task\_struct} structures are maintained by the kernel in a doubly linked list coined the “task list”.
+
+    \normalfont \indent From the perspective of memory processes are comprised of five segments: the \textit{text segment}, \textit{initialized data segment}, \textit{uninitialized data segment}, the \textit{stack} and the \textit{heap}. The \textit{text segment} contains the machine language instructions of the program which the given process executes. \cite{linuxProgInterface2010}. The \textit{initialized data segment} contains the global and static variables which are explicitly declared within a given program. The \textit{uninitialized data segment} contains all global and static variables which are not initialized at declaration within a given program. These values are initialized to 0 by the system. The \textit{stack} is data structure within memory which dynamically grows and shrinks depending on function calls within the program. A stack frame is allocated for each function call and contains the return address of the function as well as variable values to be stored in memory. Finally the \textit{heap} is a location within memory in which variables can be dynamically stored and created.
+
+    \normalfont \indent Each process has a process ID and a parent process - the process responsible for spawning the process. The way files are structured in Linux produces a tree structure with the oldest ancestor of all processes being the process with PID 1, the init process which starts when the system is booted. Processes are spawned via the \textit{fork()} system call \cite{linuxProgInterface2010}. If a child process is executing and its parent process does not call \textit{wait()} on the child process the child process is considered orphaned. This process will eventually be adopted by the init process and its resources will be reclaimed. Maintaining this child parent relationship among processes is an operating system feature employed by nearly all Unix-based operating systems.
+
+    \normalfont \indent Child processes inherit a wide range of information from the parent process. Such information includes the parent process nice value, open file descriptors, and code of execution. In effect child processes are identical clones of the parent process which spawned them. By using the \textit{exec()} family of system calls these processes can be changed to execute different commands.
+
+    \normalfont \indent A single process can contain multiple threads. All threads of a process share the aforementioned data segments which comprise the process, thus threads share the same virtual memory space with other threads created in the same process. Threads solve a number of problems arising from attempting to achieve concurrency. First off, threads all have access to universal data of a process which streamlines interprocess communication. Secondly, threads creation is much faster than calling fork() (Linux threads are generated using the clone() system call) When writing a multithreaded program however one must create synchronization structures to control the access of shared variables and data.
+
+    \normalfont \indent In Linux threads are given a unique ID’s, signal masks, real-time scheduling priority, errno variable, and a unique stack. It is important to discuss threads from the perspective of the Kernel when discussing thread implementation in Linux. From the perspective of the Linux Kernel, threads look identical to a process that shares data and information with another process. There are no thread support  structures built within the Kernel. One last point of discussion regarding threads within the Linux environment is the distinction between user-level and Kernel-level threads. Kernel-level threads exist only within the Kernel and are used to service system critical background processes. These types of threads have no virtual  memory space.
+
+	\normalfont \indent Below is a simple C program which first prints its process ID then spawns another process via the \textit{fork()} system call. The child process prints the process ID of its parent process. We find through executing the code that the child process prints the process ID of its parent process. This simple
+program illustrates the relationship between parent and child processes in Linux/UNIX.
+
+\lstinputlisting[language=c]{example1One.c}
+\begin{center}
+Figure 1.1 Process Creation via Fork  
+\end{center}
+
+    \subsubsection{\bf Scheduling}
+      \normalfont \indent On Linux systems the default scheduling procedure is the round-robin time-sharing method, this ensures fairness and process responsiveness. Each process has a value coined the \textit{nice} value which allows a process to manipulate the Kernels scheduling algorithm. Nice values range from -20 to 19, the former being a higher priority process.  Processes with low nice value are considered privileged processes and spend more time on a CPU, hence the given process is not “nice” to other processes.
+
+      \normalfont \indent Process priority leads us into the topic of real-time applications. Such applications usually have strict temporal requirements, and must provide a guaranteed maximum response time for external inputs. A classic example of such a process would be an automated vehicle navigation system. There are several distinguishable categories, time-critical processes can fall under and multiple different scheduling API’s/policies used to service each process type. SCHED\_OTHER, SCHED\_BATCH, SCHED\_IDLE, SCHED\_RR and SCHED\_FIFO \cite{linuxProgInterface2010}. Process operating under the latter two take priority over all other processes. Linux provides 99 priority levels for real time processes (1 being low and 99 being top priority).
+
+      \normalfont \indent A wide variety of available system calls can manipulate both a process’ priority and policy. The sched\_setscheduler() system call allows one to change both of the aforementioned attributes of a process while the sched\_setparam() allows one to change the scheduling priority of a process. The sched\_getscheduler () and  shed\_getparam() can also retrieve the scheduling priority and scheduling policy of given process respectively \cite{linuxProgInterface2010}. Using the aforementioned system calls it is possible to write write real-time priority “watchdog” processes capable of changing the priority and scheduling policies of various processes.
+
+      \normalfont \indent One final note of interest regarding the Linux scheduler is the concept of cpu affinity. Often times threads, after executing for a single quantum, are reloaded onto a CPU that is different than the CPU which initially executed the thread or process. This is most often because the initial CPU used to execute the given thread is busy servicing some other process. A context switch of all of the data relevant to a given thread requires some overhead, thus Linux by default employs something called soft CPU affinity where, whenever possible a process is reloaded onto the same CPU which executed it last. It is also possible via system calls to set hard CPU affinity for a given process, where the said process always executes on the same CPU. The sched\_setaffinity() and sched\_getaffinity() system calls allow the user to modify and view a given processes CPU affinity status \cite{linuxProgInterface}.
+
+	\normalfont \indent The code snippet below provides an example of how a processes priority can be changed with the \textit{getpriority()} and \textit{setpriority} system calls. The child process first prints its nice value which is equal to zero, then sleeps while the parent process set the child processes nice value to three. The child then reprints the value which has been changed from zero to three. 
+\newpage
+
+	\lstinputlisting[language=c]{example2One.c} 
+\begin{center}
+Figure 1.2 Manipulating Process Nice Values
+\end{center}
+
+\subsection{\bf Windows}
+
+  \subsubsection{\bf Processes and Threads}
+  \normalfont \indent The overall definition of a process in Windows is very similar to linux however the implementation of processes between the two operating systems differs significantly. Processes are represented by the \textit{EPROCESS} structure and threads are represented by the \textit{ETHREAD} structure in Windows. The Windows Kernel does not track relationships among child and parent processes. Thus unlike Linux, if the parent process is killed, any children of that parent process will not terminate or enter a zombie state, instead the child process will simply continue to execute \cite{windowsInternals}. The only information a Windows process has regarding their parent process is the parent PID.
+
+  \normalfont \indent Processes and threads do have built in synchronization structures such as mutexes. Processes in Windows also make use of privilege tracking objects coined access tokens. These tokens includes the identity and privileges of the user account associated with the process or thread.  The system then uses the access token to identify the user when a thread/process interacts with a securable object or tries to perform a system task that requires privileges.
+
+\normalfont \indent Unlike Linux there are four system calls in the Windows Kernel for spawning a process, \textit{CreateProcess}, \textit{CreateProcessAsUser}, \textit{CreateProcessWithTokenW}, and finally \textit{CreateProcessWithLogonW}.  Due to the fact that Windows does not maintain the parent child relationship between processes, spawned process are not exact copies of their parent counterparts as in Linux, rather new processes undergo a complicated initialization routine in which a fresh image of the task executable is loaded into the process. 
+
+  \normalfont \indent Threads in Windows can exits is a wide much wider variety of states compared to Linux. The possible states a thread in Windows can exist in are as follows: Ready, Deferred Ready, Standby, Running, Waiting, Gate Waiting, Transitioned, Terminated, and Initialized. The Windows operating system places a much greater emphasis on threads than does Linux. Unlike Linux where threads are viewed identical to processes, The Windows OS differentiates heavily between the two and has built in thread support structures.
+
+  \subsubsection{\bf Scheduling}
+  \normalfont \indent Windows scheduling code is implemented in the Kernel. Like Linux the scheduling algorithm is priority driven, ready threads are run on the CPU for a time slot called a quantum.  Threads can be preempted by higher priority threads, in such a scenario the currently executing thread may not run for the entirety of a quantum. Like Linux when a quantum is up, or a currently running thread relinquishes the CPU, the processor performs a context switch to the next highest priority thread in which the volatile state of the currently running thread is stored into memory and the volatile state of the next thread to be executed is loaded onto the CPU.
+
+  \normalfont \indent Windows uses 32 priority levels. Levels 16-31 are used for high priority real-time processes while levels 1-15 are for low priority levels. A process can fall into one of four priority classes listed below which represent a range of the 1 to 31 priority levels\cite{windowsInternals}.
+
+        \begin{center}
+        \begin{itemize}
+                \item \textbf{Idle}
+                \item \textbf{Normal}
+                \item \textbf{High}
+                \item \textbf{Real Time}
+        \end{itemize}
+        \end{center}
+
+        \normalfont \indent When performing process scheduling the Windows API first organizes processes based off of there priority level. Processes are further organized based on the priority level of threads within a given thread pool of a process \cite{windowsInternals}. Threads receive a base priority attribute which is within the range of the priority class of the process the thread belongs to. Threads which fall under into the 1-15 priority level can have their priority level increased or decreased by up to two levels, but cannot have their priority level fall below the threads base priority.
+
+	\normalfont \indent The way Windows services thread execution within a process differs drastically from the Linux implementation. The approach of these two operating systems reflects the history of the program. Linux is a Unix-based operating built off the MINIX OS. Windows on the other hand was built from the ground and is structurally unique from UNIX.
+
+\subsection{\bf FreeBSD}
+   
+  \subsubsection{\bf Processes and Threads}
+    \normalfont \indent FreeBSD is a UNIX like operating system and thus shares many traits with linux Distros. Processes are executing programs consisting of at least one thread of execution, virtual memory space containing all accessible variables and pieces of data available to the process. FreeBSD is mostly POSIX compliant, thus nearly all of the system calls frequently used to manage processes and scheduling policies are shared between Linux Distros and FreeBSD operating system. Due to the fact that FreeBSD share many features with Linux, only the differences between these two operating systems will be discussed, the most pertinent of which is the way FreeBSD schedules and defines threads.
+
+    \normalfont \indent As stated earlier, from the perspective of the Linux Kernel a thread looks identical to a process that shares resources with another process. FreeBSD has a different approach. Threads in FreeBSD operating in one of two modes, the \cite{FreeBSD}\textit{Kernel Mode} and the \textit{User Mode}. A thread operates in user mode in nearly all instances, however when making a system call to the operating system a thread will enter Kernel mode in which it accesses the underlying hardware of the machine.
+
+    \normalfont \indent Threads are sorted into one of three queues for each CPU,  \cite{FreeBSDDesign} the run queue, sleep queue, and turnstile queue. Threads that are runnable are placed into the run queue, whereas threads that are blocked waiting for event are placed in either the sleep or turnstile queues. The run queue is then organized by thread priority. Thread priorities can fall within a range of 0 to 255 with a lower value indicating higher priority. Non-real time user-mode priorities fall within the 120 to 255 priority level range. For real-time user application, the priority levels ranges between 40 and 79\cite{FreeBSDDesign}.
+
+    \normalfont \indent The difference between the number of  priority levels in Linux and FreeBSD is perhaps the largest difference in the ways these two programs manage processes and scheduling. Both operating systems are UNIX-based, thus it is expected that the both OS’s handle a low-level function of an operating system in a similar fashion.
+
+
+
