@@ -1,8 +1,8 @@
-# CS444
-This repository contains all of the programming and writing assignments for Operating Systems II at Oregon State University
-This class focused on Linux Kernel development and concurrent programming in C. 
+# Linux Device Drivers
 
-Assignments included:
+This repository contians Linux Device drivers, implelented for the Yocto Linux project
+
+
 1. Setting up a Qemu virtual machine running a yocto Linux image.
 2. Writing the LOOK elevator algorithm for a hard drive.
 3. Utilizing the Linux crypto api to write encrypted files to a mounted file system
